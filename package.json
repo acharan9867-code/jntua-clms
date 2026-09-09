@@ -1,0 +1,23 @@
+{
+  "name": "jntua-clms",
+  "version": "1.0.0",
+  "description": "Central Library Management System for JNTU College of Engineering Anantapur (JNTUA)",
+  "scripts": {
+    "seed": "cd backend && node database/initDb.js",
+    "server": "cd backend && node server.js",
+    "client": "cd frontend && npm run dev",
+    "build": "cd frontend && npm run build"
+  },
+  "keywords": [
+    "jntua",
+    "library-management-system",
+    "btech-cse-project",
+    "react",
+    "nodejs",
+    "express",
+    "mysql",
+    "sqlite"
+  ],
+  "author": "B.Tech CSE Project Team",
+  "license": "MIT"
+}
