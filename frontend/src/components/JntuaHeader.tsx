@@ -21,6 +21,9 @@ export const JntuaHeader: React.FC = () => {
           </div>
 
           <div className="flex items-center space-x-4 text-slate-300 text-xs">
+            <span className="hidden sm:flex items-center gap-1 text-amber-300 font-bold">
+              🌐 www.jntualibrarymanagement.com
+            </span>
             <span className="flex items-center gap-1">
               <Mail className="w-3.5 h-3.5 text-amber-400" />
               library@jntua.ac.in
@@ -129,7 +132,7 @@ export const JntuaHeader: React.FC = () => {
             Notice
           </span>
           <p className="truncate text-xs text-slate-700 font-medium">
-            Standard borrowing period is <strong>15 days</strong>. Late fine: <strong>₹1 per overdue day</strong>. Lost or damaged book penalty: <strong>₹300 + late fine</strong>. Library timings will be updated soon.
+            Standard borrowing period is <strong>15 days</strong>. Late fine: <strong>₹1 per overdue day</strong>. Lost or damaged book penalty: <strong>₹300 + late fine</strong>. Library timings: <strong>Mon–Sat 8:30 AM – 6:30 PM</strong>. Visit: <strong>www.jntualibrarymanagement.com</strong>
           </p>
         </div>
       </div>
