@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useAuth } from "../context/AuthContext";
 import {
   GraduationCap, UserCheck, Shield, Lock, Mail,
@@ -243,7 +243,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccessLogin }) => {
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full text-white/80 text-[11px] font-medium">
             <Code2 className="w-3.5 h-3.5 text-amber-400" />
             Designed & Developed by
-            <span className="font-bold text-amber-300">S. Charan Reddy</span>
+            <span className="font-bold text-amber-300">Charan Apilagunta</span>
             •
             <span className="text-white/60">JNTUA CSE</span>
           </div>
