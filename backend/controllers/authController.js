@@ -40,7 +40,7 @@ export async function login(req, res) {
       if (!isLibrarianPass) {
         return res.status(401).json({
           success: false,
-          message: 'Invalid Librarian password. Expected: charan@143232'
+          message: 'Invalid Librarian credentials. Access denied.'
         });
       }
 

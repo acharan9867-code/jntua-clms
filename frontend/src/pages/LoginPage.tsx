@@ -1,4 +1,4 @@
-﻿import React, { useState, useCallback } from "react";
+import React, { useState, useCallback } from "react";
 import { useAuth } from "../context/AuthContext";
 import {
   GraduationCap,
@@ -42,7 +42,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccessLogin }) => {
   const [studentPassword, setStudentPassword] = useState("");
 
   // Librarian form fields
-  const [librarianId, setLibrarianId] = useState("acharan apilagunta");
+  const [librarianId, setLibrarianId] = useState("");
   const [librarianPassword, setLibrarianPassword] = useState("");
 
   const [error, setError] = useState("");
@@ -61,12 +61,9 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccessLogin }) => {
     setError("");
     setCaptchaErr("");
     refreshCaptcha();
-    if (role === "librarian") {
-      setLibrarianId("acharan apilagunta");
-      setLibrarianPassword("charan@143232");
-    } else {
-      setStudentPassword("");
-    }
+    setStudentPassword("");
+    setLibrarianId("");
+    setLibrarianPassword("");
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -96,11 +93,11 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccessLogin }) => {
         // Librarian Login
         const trimmedId = librarianId.trim();
         if (!trimmedId) {
-          setError("Please enter the Librarian username (acharan apilagunta).");
+          setError("Please enter your Librarian ID / Username.");
           return;
         }
         if (!librarianPassword) {
-          setError("Please enter the Librarian password (charan@143232).");
+          setError("Please enter your Librarian password.");
           return;
         }
         await login(trimmedId, librarianPassword, "librarian");
@@ -296,27 +293,25 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccessLogin }) => {
                   <div
                     className="p-2.5 rounded-xl text-[11px] font-medium flex items-center gap-2"
                     style={{
-                      background: "rgba(245,158,11,0.1)",
-                      border: "1px solid rgba(245,158,11,0.25)",
+                      background: "rgba(245,158,11,0.08)",
+                      border: "1px solid rgba(245,158,11,0.2)",
                       color: "#FCD34D",
                     }}
                   >
                     <KeyRound className="w-4 h-4 shrink-0 text-amber-400" />
-                    <span>
-                      Librarian: <strong>acharan apilagunta</strong> • Password: <strong>charan@143232</strong>
-                    </span>
+                    <span>Authorized library administrative personnel only</span>
                   </div>
 
                   <div>
                     <label className="block text-xs font-bold mb-1.5 flex items-center gap-1.5" style={{ color: "#94A3B8" }}>
                       <User className="w-3.5 h-3.5 text-amber-400" />
-                      Librarian Name / ID <span className="text-red-400">*</span>
+                      Librarian ID / Username <span className="text-red-400">*</span>
                     </label>
                     <input
                       type="text"
                       value={librarianId}
                       onChange={(e) => setLibrarianId(e.target.value)}
-                      placeholder="acharan apilagunta"
+                      placeholder="Enter Librarian ID"
                       className="dark-input"
                       required
                     />
@@ -325,13 +320,13 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccessLogin }) => {
                   <div>
                     <label className="block text-xs font-bold mb-1.5 flex items-center gap-1.5" style={{ color: "#94A3B8" }}>
                       <Lock className="w-3.5 h-3.5 text-amber-400" />
-                      Librarian Password <span className="text-red-400">*</span>
+                      Password <span className="text-red-400">*</span>
                     </label>
                     <input
                       type="password"
                       value={librarianPassword}
                       onChange={(e) => setLibrarianPassword(e.target.value)}
-                      placeholder="charan@143232"
+                      placeholder="••••••••••••"
                       className="dark-input"
                       required
                     />
@@ -440,8 +435,8 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccessLogin }) => {
                   {
                     role: "admin" as const,
                     icon: Shield,
-                    name: "Acharan Apilagunta",
-                    id: "Chief Librarian • charan@143232",
+                    name: "Chief Librarian",
+                    id: "Library Admin Portal",
                     color: "#F59E0B",
                     glow: "rgba(245,158,11,0.3)",
                   },
