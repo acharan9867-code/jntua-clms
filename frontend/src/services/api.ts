@@ -178,5 +178,35 @@ export const api = {
     request<{ success: boolean; message: string }>('/settings', {
       method: 'PUT',
       body: JSON.stringify({ key_name, value })
-    })
+    }),
+
+  // Book Requests
+  submitBookRequest: (data: Record<string, any>) =>
+    request<{ success: boolean; message: string; requestId: number }>('/book-requests', {
+      method: 'POST',
+      body: JSON.stringify(data)
+    }),
+
+  getBookRequests: (params?: { status?: string; search?: string }) => {
+    const query = new URLSearchParams();
+    if (params?.status) query.set('status', params.status);
+    if (params?.search) query.set('search', params.search);
+    return request<{ success: boolean; requests: any[]; stats: any }>(`/book-requests?${query.toString()}`);
+  },
+
+  approveBookRequest: (id: number, data: Record<string, any>) =>
+    request<{ success: boolean; message: string }>(`/book-requests/${id}/approve`, {
+      method: 'PUT',
+      body: JSON.stringify(data)
+    }),
+
+  rejectBookRequest: (id: number, admin_comment: string) =>
+    request<{ success: boolean; message: string }>(`/book-requests/${id}/reject`, {
+      method: 'PUT',
+      body: JSON.stringify({ admin_comment })
+    }),
+
+  cancelBookRequest: (id: number) =>
+    request<{ success: boolean; message: string }>(`/book-requests/${id}`, { method: 'DELETE' })
 };
+

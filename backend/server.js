@@ -8,6 +8,7 @@ import reservationRoutes from './routes/reservationRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
 import reportRoutes from './routes/reportRoutes.js';
 import settingsRoutes from './routes/settingsRoutes.js';
+import bookRequestRoutes from './routes/bookRequestRoutes.js';
 import { initializeDatabase } from './database/initDb.js';
 
 dotenv.config();
@@ -31,6 +32,7 @@ app.use('/api/reservations', reservationRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/reports', reportRoutes);
 app.use('/api/settings', settingsRoutes);
+app.use('/api/book-requests', bookRequestRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {

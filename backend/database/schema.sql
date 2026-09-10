@@ -102,3 +102,33 @@ CREATE INDEX IF NOT EXISTS idx_transactions_user ON transactions(user_id);
 CREATE INDEX IF NOT EXISTS idx_transactions_book ON transactions(book_id);
 CREATE INDEX IF NOT EXISTS idx_transactions_status ON transactions(status);
 CREATE INDEX IF NOT EXISTS idx_reservations_book_status ON reservations(book_id, status);
+
+-- 7. Book Requests Table (Student/Faculty requests for new books — Admin approves/rejects)
+CREATE TABLE IF NOT EXISTS book_requests (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id INTEGER NOT NULL,
+  title VARCHAR(255) NOT NULL,
+  author VARCHAR(255) NOT NULL,
+  isbn VARCHAR(30),
+  publisher VARCHAR(150),
+  edition VARCHAR(50),
+  year_published INTEGER,
+  category_id INTEGER,
+  department VARCHAR(100),
+  reason TEXT NOT NULL,
+  priority VARCHAR(20) NOT NULL DEFAULT 'normal' CHECK (priority IN ('low', 'normal', 'high', 'urgent')),
+  copies_requested INTEGER NOT NULL DEFAULT 2,
+  estimated_price DECIMAL(10,2),
+  status VARCHAR(20) NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'approved', 'rejected', 'ordered')),
+  admin_comment TEXT,
+  reviewed_by INTEGER,
+  reviewed_at DATETIME,
+  requested_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+  FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE SET NULL,
+  FOREIGN KEY (reviewed_by) REFERENCES users(id) ON DELETE SET NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_book_requests_user ON book_requests(user_id);
+CREATE INDEX IF NOT EXISTS idx_book_requests_status ON book_requests(status);

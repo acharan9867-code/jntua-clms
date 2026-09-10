@@ -5,7 +5,8 @@ import { useAuth } from '../context/AuthContext';
 import { BookCard } from '../components/BookCard';
 import { BookModal } from '../components/BookModal';
 import { AddBookModal } from '../components/AddBookModal';
-import { Search, Filter, Plus, BookOpen, Layers, RefreshCw } from 'lucide-react';
+import { Search, Filter, Plus, BookOpen, Layers, RefreshCw, BookPlus } from 'lucide-react';
+import { BookRequestModal } from '../components/BookRequestModal';
 
 interface CatalogPageProps {
   onIssueSuccess?: () => void;
@@ -24,6 +25,7 @@ export const CatalogPage: React.FC<CatalogPageProps> = ({ onIssueSuccess }) => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [selectedBook, setSelectedBook] = useState<Book | null>(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState<boolean>(false);
+  const [isRequestModalOpen, setIsRequestModalOpen] = useState<boolean>(false);
   const [feedbackMessage, setFeedbackMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
   const fetchCategories = async () => {
@@ -157,12 +159,19 @@ export const CatalogPage: React.FC<CatalogPageProps> = ({ onIssueSuccess }) => {
             {user?.role === 'admin' && (
               <button
                 onClick={() => setIsAddModalOpen(true)}
-                className="px-3.5 py-2 rounded-lg text-xs font-bold text-white bg-jntua-navy hover:bg-blue-900 shadow transition-colors flex items-center gap-1.5"
+                className="btn-ripple px-3.5 py-2 rounded-lg text-xs font-bold text-white bg-jntua-navy hover:bg-blue-900 shadow transition-all flex items-center gap-1.5"
               >
                 <Plus className="w-4 h-4 text-amber-400" />
                 Add New Book
               </button>
             )}
+            <button
+              onClick={() => setIsRequestModalOpen(true)}
+              className="btn-ripple px-3.5 py-2 rounded-lg text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 shadow transition-all flex items-center gap-1.5"
+            >
+              <BookPlus className="w-4 h-4" />
+              Request a Book
+            </button>
           </div>
         </div>
 
@@ -309,6 +318,14 @@ export const CatalogPage: React.FC<CatalogPageProps> = ({ onIssueSuccess }) => {
         onClose={() => setIsAddModalOpen(false)}
         onSubmit={handleAddBook}
       />
+
+      {/* Book Request Modal (all logged-in users) */}
+      {isRequestModalOpen && (
+        <BookRequestModal
+          onClose={() => setIsRequestModalOpen(false)}
+          onSuccess={() => setFeedbackMessage({ type: 'success', text: 'Book request submitted! Librarian will review it shortly.' })}
+        />
+      )}
     </div>
   );
 };
