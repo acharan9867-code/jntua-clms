@@ -4,6 +4,8 @@ import { fileURLToPath } from 'url';
 import bcrypt from 'bcryptjs';
 import db from '../config/db.js';
 import { calculateDueDate, formatDbDate } from '../utils/fineCalculator.js';
+import { seedAcademicBooks } from './seedAcademic500.js';
+
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -21,11 +23,13 @@ export async function initializeDatabase() {
   const existingCategories = await db.query('SELECT COUNT(*) as count FROM categories');
   const count = existingCategories[0]?.count || 0;
   if (count > 0) {
-    console.log('ℹ️ Database already contains data. Skipping initial seeding.');
+    console.log('ℹ️ Base data exists. Running academic book catalog seed...');
+    await seedAcademicBooks();
     return;
   }
 
   console.log('🌱 Seeding initial JNTUA catalog, users, and transactions...');
+
 
   // 1. Seed Categories
   const categories = [
@@ -399,7 +403,11 @@ export async function initializeDatabase() {
   }
 
   console.log('✅ JNTUA CLMS Database seeding completed successfully!');
+
+  // Seed 524 academic B.Tech books across all departments
+  await seedAcademicBooks();
 }
+
 
 // Run directly if invoked as script
 if (process.argv[1] && process.argv[1].endsWith('initDb.js')) {
@@ -413,3 +421,4 @@ if (process.argv[1] && process.argv[1].endsWith('initDb.js')) {
       process.exit(1);
     });
 }
+
