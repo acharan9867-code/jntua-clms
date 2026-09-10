@@ -6,7 +6,7 @@ interface AuthContextType {
   user: User | null;
   stats: UserStats | null;
   isLoading: boolean;
-  login: (identifier: string, password?: string) => Promise<void>;
+  login: (identifier: string, password?: string, loginType?: 'student' | 'librarian') => Promise<void>;
   logout: () => void;
   refreshProfile: () => Promise<void>;
   switchDemoRole: (role: 'student' | 'faculty' | 'admin') => Promise<void>;
@@ -51,10 +51,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     refreshProfile();
   }, []);
 
-  const login = async (identifier: string, password = 'jntua@123') => {
+  const login = async (identifier: string, password = 'jntua@123', loginType?: 'student' | 'librarian') => {
     setIsLoading(true);
     try {
-      const res = await api.login({ identifier, password });
+      const res = await api.login({ identifier, password, loginType });
       if (res.success && res.token) {
         setAuthToken(res.token);
         setUser(res.user);
@@ -72,12 +72,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const switchDemoRole = async (role: 'student' | 'faculty' | 'admin') => {
-    const identifiers: Record<string, string> = {
-      student: '21001A0501',
-      faculty: 'JNTUA-FAC-101',
-      admin: 'LIBRARIAN-01'
-    };
-    await login(identifiers[role], 'jntua@123');
+    if (role === 'admin') {
+      await login('acharan apilagunta', 'charan@143232', 'librarian');
+    } else if (role === 'faculty') {
+      await login('JNTUA-FAC-101', 'jntua@123', 'student');
+    } else {
+      await login('21001A0501', 'jntua@123', 'student');
+    }
   };
 
   return (

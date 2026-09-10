@@ -23,7 +23,16 @@ export async function initializeDatabase() {
   const existingCategories = await db.query('SELECT COUNT(*) as count FROM categories');
   const count = existingCategories[0]?.count || 0;
   if (count > 0) {
-    console.log('ℹ️ Base data exists. Running academic book catalog seed...');
+    console.log('ℹ️ Base data exists. Ensuring Librarian credentials and running academic book seed...');
+    try {
+      const adminPass = await bcrypt.hash('charan@143232', 10);
+      await db.run(
+        "UPDATE users SET name = 'Acharan Apilagunta', email = 'acharan9867@gmail.com', password_hash = ? WHERE role = 'admin' OR member_id = 'LIBRARIAN-01'",
+        [adminPass]
+      );
+    } catch (err) {
+      console.warn('Admin sync notice:', err.message);
+    }
     await seedAcademicBooks();
     return;
   }
@@ -52,16 +61,18 @@ export async function initializeDatabase() {
 
   // 2. Seed Users
   const defaultPasswordHash = await bcrypt.hash('jntua@123', 10);
+  const librarianPasswordHash = await bcrypt.hash('charan@143232', 10);
 
   const users = [
     {
       member_id: 'LIBRARIAN-01',
-      name: 'Dr. M. Sreenivasulu',
-      email: 'admin@jntua.ac.in',
+      name: 'Acharan Apilagunta',
+      email: 'acharan9867@gmail.com',
       role: 'admin',
       department: 'Central Library',
       phone: '+91 8554 272433',
-      max_books_allowed: 10
+      max_books_allowed: 10,
+      custom_password_hash: librarianPasswordHash
     },
     {
       member_id: 'JNTUA-FAC-101',
@@ -122,7 +133,7 @@ export async function initializeDatabase() {
   for (const u of users) {
     await db.run(
       'INSERT INTO users (member_id, name, email, password_hash, role, department, phone, max_books_allowed, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
-      [u.member_id, u.name, u.email, defaultPasswordHash, u.role, u.department, u.phone, u.max_books_allowed, 'active']
+      [u.member_id, u.name, u.email, u.custom_password_hash || defaultPasswordHash, u.role, u.department, u.phone, u.max_books_allowed, 'active']
     );
   }
 
