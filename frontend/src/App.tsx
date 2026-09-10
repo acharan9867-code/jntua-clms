@@ -8,7 +8,6 @@ import { AdminDashboard } from "./pages/AdminDashboard";
 import { ReportsPage } from "./pages/ReportsPage";
 import { SettingsPage } from "./pages/SettingsPage";
 import { LoginPage } from "./pages/LoginPage";
-import { MouseGlow } from "./components/MouseGlow";
 
 function MainApp() {
   const { user, isLoading } = useAuth();
@@ -38,8 +37,6 @@ function MainApp() {
       <div className="orb w-[500px] h-[500px] bg-blue-700" style={{ bottom: "-150px", right: "-150px", animationDelay: "3s" }} />
       <div className="orb w-[300px] h-[300px] bg-indigo-600" style={{ top: "50%", left: "50%", animationDelay: "6s" }} />
 
-      {/* Premium mouse cursor spotlight — pointer-events:none, desktop only */}
-      <MouseGlow />
 
       {/* Header */}
       <JntuaHeader />
