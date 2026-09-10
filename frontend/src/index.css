@@ -1,10 +1,11 @@
-@tailwind base;
+﻿@tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   body {
     font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    background-color: #f8fafc;
   }
   
   h1, h2, h3, .font-serif-jntu {
@@ -12,21 +13,98 @@
   }
 }
 
-/* Custom scrollbar for clean library look */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+/* ─── Button Ripple Effect ─── */
+.btn-ripple {
+  position: relative;
+  overflow: hidden;
+  transform: translateZ(0);
 }
 
-::-webkit-scrollbar-track {
-  background: #f1f5f9;
+.btn-ripple:active {
+  transform: scale(0.97);
 }
 
-::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 4px;
+.ripple-effect {
+  position: absolute;
+  border-radius: 50%;
+  width: 10px;
+  height: 10px;
+  background: rgba(255, 255, 255, 0.4);
+  transform: translate(-50%, -50%) scale(0);
+  animation: ripple-grow 0.6s linear;
+  pointer-events: none;
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+@keyframes ripple-grow {
+  to {
+    transform: translate(-50%, -50%) scale(30);
+    opacity: 0;
+  }
+}
+
+/* ─── Button hover/active transitions (global) ─── */
+button:not(:disabled) {
+  transition: all 0.18s ease;
+}
+
+button:not(:disabled):active {
+  transform: scale(0.96);
+  filter: brightness(0.92);
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ─── Global page background ─── */
+.page-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -10;
+  background: linear-gradient(135deg, #f0f4ff 0%, #f8fafc 40%, #fffbeb 100%);
+}
+
+/* ─── Animated shake for errors ─── */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-6px); }
+  40% { transform: translateX(6px); }
+  60% { transform: translateX(-4px); }
+  80% { transform: translateX(4px); }
+}
+.animate-shake {
+  animation: shake 0.4s ease;
+}
+
+/* ─── Card hover lift ─── */
+.card-hover {
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+.card-hover:hover {
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.10);
+  transform: translateY(-2px);
+}
+
+/* ─── Custom scrollbar ─── */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: #f1f5f9; }
+::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+/* ─── Focus ring improvements ─── */
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.25);
+  border-color: #f59e0b !important;
+}
+
+/* ─── Smooth page transitions ─── */
+.page-enter {
+  animation: fadeSlideIn 0.25s ease;
+}
+
+@keyframes fadeSlideIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
 }

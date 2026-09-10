@@ -346,7 +346,7 @@ export async function initializeDatabase() {
   const settings = [
     {
       key_name: 'library_timings',
-      value: 'Library timings will be updated soon. Notice will be published on the university portal as per academic schedule.',
+      value: 'Monday to Saturday: 8:30 AM – 6:30 PM | Sundays & Public Holidays: Closed',
       description: 'Official JNTUA Central Library operating hours'
     },
     {
