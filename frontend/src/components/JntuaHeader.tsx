@@ -68,7 +68,7 @@ export const JntuaHeader: React.FC = () => {
             <div className="mt-1.5 flex items-center gap-2 flex-wrap">
               <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold"
                 style={{ background: "rgba(56,189,248,0.15)", color: "#38BDF8", border: "1px solid rgba(56,189,248,0.3)" }}>
-                ✦ Dr. A.P.J. Abdul Kalam Central Library
+                ✦ DOOM Central Library
               </span>
               <span className="text-[10px] font-mono" style={{ color: "#475569" }}>CLMS v2.4 • Mon–Sat 8:30AM–6:30PM</span>
             </div>
@@ -115,3 +115,4 @@ export const JntuaHeader: React.FC = () => {
     </header>
   );
 };
+

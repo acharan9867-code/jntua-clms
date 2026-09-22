@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { api } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { Settings, Clock, Save, ShieldAlert, CheckCircle, Info } from 'lucide-react';
@@ -66,7 +66,7 @@ export const SettingsPage: React.FC = () => {
         >
           <span>{feedback.text}</span>
           <button onClick={() => setFeedback(null)} className="ml-4 font-bold text-slate-500">
-            ✕
+            âœ•
           </button>
         </div>
       )}
@@ -78,7 +78,7 @@ export const SettingsPage: React.FC = () => {
           University Library Configuration & Operating Policies
         </h2>
         <p className="text-xs text-slate-500 mt-0.5">
-          Configurable institutional settings for JNTUA Central Library
+          Configurable institutional settings for DOOM Central Library
         </p>
       </div>
 
@@ -153,17 +153,17 @@ export const SettingsPage: React.FC = () => {
 
           <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl">
             <span className="text-slate-500 font-medium block">Overdue Fine Rate:</span>
-            <span className="text-xl font-bold text-rose-600 mt-1 block">₹1 / day</span>
+            <span className="text-xl font-bold text-rose-600 mt-1 block">â‚¹1 / day</span>
             <p className="text-[11px] text-slate-500 mt-1">
-              ₹0 on or before due date. ₹1 per day thereafter.
+              â‚¹0 on or before due date. â‚¹1 per day thereafter.
             </p>
           </div>
 
           <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl">
             <span className="text-slate-500 font-medium block">Lost / Damaged Penalty:</span>
-            <span className="text-xl font-bold text-amber-700 mt-1 block">₹300 + Late Fine</span>
+            <span className="text-xl font-bold text-amber-700 mt-1 block">â‚¹300 + Late Fine</span>
             <p className="text-[11px] text-slate-500 mt-1">
-              ₹300 administrative charge plus any overdue fine.
+              â‚¹300 administrative charge plus any overdue fine.
             </p>
           </div>
         </div>
@@ -171,3 +171,4 @@ export const SettingsPage: React.FC = () => {
     </div>
   );
 };
+

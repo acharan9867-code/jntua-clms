@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+﻿import React, { useState } from "react";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import { JntuaHeader } from "./components/JntuaHeader";
 import { Navbar } from "./components/Navbar";
@@ -22,7 +22,7 @@ function MainApp() {
         <div className="text-center space-y-4 relative z-10">
           <div className="w-14 h-14 border-2 border-electric border-t-transparent rounded-full animate-spin mx-auto" style={{ boxShadow: "0 0 20px rgba(56,189,248,0.5)" }} />
           <p className="text-sm font-bold text-electric text-glow font-serif-jntu tracking-widest uppercase">
-            JNTUA Library System
+            DOOM Library System
           </p>
           <p className="text-xs text-dark-500">Connecting to Central Library Network...</p>
         </div>
@@ -78,21 +78,21 @@ function MainApp() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 grid grid-cols-1 md:grid-cols-3 gap-8 relative z-10">
           <div>
             <h4 className="text-electric font-bold text-sm mb-3 font-serif-jntu text-glow-sm">
-              Dr. A.P.J. Abdul Kalam Central Library
+              DOOM Central Library
             </h4>
             <p className="text-dark-500 text-xs leading-relaxed">
               JNTUA College of Engineering, Ananthapuramu - 515002.<br />
               Jawaharlal Nehru Technological University Anantapur.
             </p>
-            <div className="mt-3 text-xs text-electric/60 font-mono">🌐 www.jntualibrarymanagement.com</div>
+            <div className="mt-3 text-xs text-electric/60 font-mono">ðŸŒ www.jntualibrarymanagement.com</div>
           </div>
           <div>
             <h4 className="text-white font-bold text-sm mb-3">Library Rules</h4>
             <ul className="space-y-1.5 text-xs" style={{ color: "#64748B" }}>
-              <li className="flex items-center gap-2"><span className="text-electric">▸</span> Borrowing: <strong className="text-slate-300 ml-1">15 days</strong></li>
-              <li className="flex items-center gap-2"><span className="text-electric">▸</span> Late fine: <strong className="text-slate-300 ml-1">₹1 per day</strong></li>
-              <li className="flex items-center gap-2"><span className="text-electric">▸</span> Lost book: <strong className="text-slate-300 ml-1">₹300 + fine</strong></li>
-              <li className="flex items-center gap-2"><span className="text-electric">▸</span> Timings: <strong className="text-slate-300 ml-1">Mon–Sat 8:30AM–6:30PM</strong></li>
+              <li className="flex items-center gap-2"><span className="text-electric">â–¸</span> Borrowing: <strong className="text-slate-300 ml-1">15 days</strong></li>
+              <li className="flex items-center gap-2"><span className="text-electric">â–¸</span> Late fine: <strong className="text-slate-300 ml-1">â‚¹1 per day</strong></li>
+              <li className="flex items-center gap-2"><span className="text-electric">â–¸</span> Lost book: <strong className="text-slate-300 ml-1">â‚¹300 + fine</strong></li>
+              <li className="flex items-center gap-2"><span className="text-electric">â–¸</span> Timings: <strong className="text-slate-300 ml-1">Monâ€“Sat 8:30AMâ€“6:30PM</strong></li>
             </ul>
           </div>
           <div>
@@ -102,10 +102,10 @@ function MainApp() {
               Stack: React + TypeScript, Node.js + Express, SQLite, JWT Auth.
             </p>
             <div className="mt-3 text-[11px] text-electric/80 font-semibold">
-              ⚡ Developed by Charan Apilagunta • JNTUA CSE
+              âš¡ Developed by Charan Apilagunta â€¢ JNTUA CSE
             </div>
             <div className="mt-1 text-[10px]" style={{ color: "#334155" }}>
-              © {new Date().getFullYear()} JNTUA Library Management System
+              Â© {new Date().getFullYear()} DOOM Library Management System
             </div>
           </div>
         </div>
@@ -119,3 +119,4 @@ function MainApp() {
 export default function App() {
   return <AuthProvider><MainApp /></AuthProvider>;
 }
+

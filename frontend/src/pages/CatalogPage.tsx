@@ -163,7 +163,7 @@ export const CatalogPage: React.FC<CatalogPageProps> = ({ onIssueSuccess }) => {
           <div>
             <h2 className="text-xl font-bold text-slate-900 font-serif-jntu flex items-center gap-2">
               <BookOpen className="w-5 h-5 text-amber-600" />
-              Central Library Book Repository
+              DOOM Central Library Book Repository
             </h2>
             <p className="text-xs text-slate-500 mt-0.5">
               Search across Title, Author, and ISBN with real-time shelf tracking
@@ -283,7 +283,7 @@ export const CatalogPage: React.FC<CatalogPageProps> = ({ onIssueSuccess }) => {
           return (
             <div className="py-16 text-center">
               <div className="inline-block w-8 h-8 border-4 border-amber-500 border-t-transparent rounded-full animate-spin"></div>
-              <p className="text-xs text-slate-500 mt-2 font-medium">Scanning JNTUA Library stacks...</p>
+              <p className="text-xs text-slate-500 mt-2 font-medium">Scanning DOOM Library stacks...</p>
             </div>
           );
         }
@@ -366,3 +366,4 @@ export const CatalogPage: React.FC<CatalogPageProps> = ({ onIssueSuccess }) => {
     </div>
   );
 };
+

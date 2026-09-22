@@ -336,7 +336,7 @@ export const BorrowModal: React.FC<BorrowModalProps> = ({
           >
             <Clock className="w-4 h-4 shrink-0 text-amber-400 mt-0.5" />
             <div className="text-[11px] leading-relaxed">
-              <strong>JNTUA Central Library Rule:</strong> 15-day borrowing period. Late returns incur a fine of ₹1/day. Your details will be registered securely in the university database.
+              <strong>DOOM Central Library Rule:</strong> 15-day borrowing period. Late returns incur a fine of ₹1/day. Your details will be registered securely in the university database.
             </div>
           </div>
 
@@ -372,3 +372,4 @@ export const BorrowModal: React.FC<BorrowModalProps> = ({
     </div>
   );
 };
+

@@ -168,10 +168,10 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccessLogin }) => {
               className="text-sm font-bold font-serif-jntu tracking-wider uppercase text-glow"
               style={{ color: "#F8FAFC" }}
             >
-              JNTUA Central Library
+              DOOM Central Library
             </h2>
             <p className="text-[11px] mt-0.5 font-medium" style={{ color: "#38BDF8" }}>
-              Dr. A.P.J. Abdul Kalam Library — Member Sign In
+              DOOM Central Library — Member Sign In
             </p>
           </div>
 
@@ -428,3 +428,4 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccessLogin }) => {
     </div>
   );
 };
+
