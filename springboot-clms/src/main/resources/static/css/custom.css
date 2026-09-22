@@ -1,0 +1,139 @@
+﻿/* ─────────────────────────────────────────────────────────────────────────────
+   JNTUA CLMS — Custom CSS (Academic Dark Theme)
+   Author: Charan Apilagunta | JNTUA CSE
+───────────────────────────────────────────────────────────────────────────── */
+
+:root {
+  --clms-primary:   #1a3c5e;
+  --clms-accent:    #2e6da4;
+  --clms-gold:      #c9a227;
+  --clms-dark-bg:   #0f1b2d;
+  --clms-card-bg:   #162032;
+  --clms-text:      #e0e8f0;
+  --clms-muted:     #8899aa;
+  --clms-border:    #1f3048;
+  --clms-success:   #198754;
+  --clms-danger:    #dc3545;
+}
+
+/* ── Base ── */
+body { background: var(--clms-dark-bg); color: var(--clms-text); font-family: 'Segoe UI', sans-serif; }
+.clms-body { background: linear-gradient(135deg, #0a1628 0%, #0f2040 100%); min-height: 100vh; }
+.clms-login-body { background: linear-gradient(135deg, #0a1628 0%, #1a3060 50%, #0f2040 100%); }
+
+/* ── Navbar ── */
+.clms-navbar {
+  background: linear-gradient(90deg, var(--clms-primary), var(--clms-dark-bg));
+  border-bottom: 2px solid var(--clms-gold);
+  padding: 0.4rem 0;
+}
+.clms-navbar .navbar-brand { color: var(--clms-gold) !important; font-size: 1.1rem; }
+.clms-navbar .nav-link { color: var(--clms-text) !important; font-size: 0.85rem; }
+.clms-navbar .nav-link:hover { color: var(--clms-gold) !important; }
+
+/* ── Header Banner ── */
+.clms-header-banner {
+  background: rgba(44, 109, 164, 0.15);
+  border-bottom: 1px solid var(--clms-border);
+  color: var(--clms-muted);
+  font-size: 0.78rem;
+}
+
+/* ── Login Card ── */
+.login-card {
+  background: var(--clms-card-bg);
+  border: 1px solid var(--clms-border);
+  border-radius: 16px;
+  width: 100%;
+  max-width: 500px;
+  overflow: hidden;
+}
+.login-card-header {
+  background: linear-gradient(135deg, var(--clms-primary), var(--clms-accent));
+  color: #fff;
+  border-bottom: 2px solid var(--clms-gold);
+}
+.login-card .nav-pills .nav-link { color: var(--clms-muted); background: transparent; border-radius: 8px; }
+.login-card .nav-pills .nav-link.active { background: var(--clms-accent); color: #fff; }
+.btn-librarian { background: var(--clms-primary); color: var(--clms-gold); border: 1px solid var(--clms-gold); }
+.btn-librarian:hover { background: var(--clms-accent); color: #fff; }
+
+/* ── Cards ── */
+.clms-card {
+  background: var(--clms-card-bg);
+  border: 1px solid var(--clms-border);
+  border-radius: 12px;
+}
+.stat-card {
+  background: var(--clms-card-bg);
+  border: 1px solid var(--clms-border);
+  border-radius: 12px;
+  transition: box-shadow 0.2s;
+}
+.stat-card:hover { box-shadow: 0 0 16px rgba(46,109,164,0.3); }
+
+/* ── Book Card ── */
+.book-card {
+  background: var(--clms-card-bg);
+  border: 1px solid var(--clms-border);
+  border-radius: 10px;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.book-card:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(46,109,164,0.25); }
+.book-card-header {
+  background: linear-gradient(135deg, var(--clms-primary), var(--clms-dark-bg));
+  border-bottom: 1px solid var(--clms-border);
+  min-height: 70px;
+  border-radius: 10px 10px 0 0;
+}
+
+/* ── Tables ── */
+.clms-table { color: var(--clms-text) !important; font-size: 0.84rem; }
+.clms-table thead th { background: var(--clms-primary) !important; color: var(--clms-gold); border: none; font-size: 0.8rem; }
+.clms-table tbody tr { border-bottom: 1px solid var(--clms-border); }
+.clms-table tbody tr:hover { background: rgba(46,109,164,0.08) !important; }
+.table-danger { background: rgba(220,53,69,0.08) !important; }
+
+/* ── Forms ── */
+.form-control, .form-select {
+  background: #1a2d45 !important;
+  border: 1px solid var(--clms-border) !important;
+  color: var(--clms-text) !important;
+  border-radius: 8px;
+}
+.form-control::placeholder { color: var(--clms-muted); }
+.form-control:focus, .form-select:focus {
+  border-color: var(--clms-accent) !important;
+  box-shadow: 0 0 0 0.2rem rgba(46,109,164,0.25) !important;
+}
+.input-group-text { background: var(--clms-primary); border: 1px solid var(--clms-border); color: var(--clms-gold); }
+
+/* ── Nav Tabs ── */
+.nav-tabs .nav-link { color: var(--clms-muted); border-color: transparent; }
+.nav-tabs .nav-link.active { color: var(--clms-text); background: var(--clms-card-bg); border-color: var(--clms-border) var(--clms-border) var(--clms-card-bg); }
+
+/* ── Alerts ── */
+.alert-info { background: rgba(13,202,240,0.1); border-color: rgba(13,202,240,0.3); color: #8ae6ff; }
+.alert-success { background: rgba(25,135,84,0.15); border-color: rgba(25,135,84,0.4); color: #75dba8; }
+.alert-danger { background: rgba(220,53,69,0.15); border-color: rgba(220,53,69,0.4); color: #f8a0a8; }
+.alert-warning { background: rgba(255,193,7,0.1); border-color: rgba(255,193,7,0.4); color: #ffd86e; }
+
+/* ── Footer ── */
+.clms-footer { background: var(--clms-dark-bg); border-top: 1px solid var(--clms-border); color: var(--clms-muted); }
+
+/* ── Buttons ── */
+.btn-primary { background: var(--clms-accent); border-color: var(--clms-accent); }
+.btn-primary:hover { background: #2560a0; border-color: #2560a0; }
+.btn-outline-secondary { color: var(--clms-muted); border-color: var(--clms-border); }
+.btn-outline-secondary:hover { background: var(--clms-border); color: var(--clms-text); }
+
+/* ── Card headers ── */
+.card-header { background: var(--clms-primary); color: var(--clms-text); border-bottom: 1px solid var(--clms-border); }
+.card { background: var(--clms-card-bg); border: 1px solid var(--clms-border); }
+.card-footer { background: rgba(0,0,0,0.15); border-top: 1px solid var(--clms-border); }
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--clms-dark-bg); }
+::-webkit-scrollbar-thumb { background: var(--clms-border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--clms-accent); }

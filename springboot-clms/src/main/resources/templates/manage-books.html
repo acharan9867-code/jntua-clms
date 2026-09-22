@@ -1,0 +1,90 @@
+﻿<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: head('Manage Inventory')}"></head>
+<body class="clms-body">
+<div th:replace="~{fragments/header :: navbar}"></div>
+
+<div class="container-fluid px-4 py-4">
+  <div class="d-flex align-items-center gap-3 mb-3">
+    <a th:href="@{/admin/dashboard}" class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-left me-1"></i>Back</a>
+    <h4 class="fw-bold mb-0"><i class="bi bi-archive-fill me-2"></i>Book Inventory</h4>
+  </div>
+
+  <div th:if="${successMsg}" class="alert alert-success alert-dismissible py-2">
+    <i class="bi bi-check-circle-fill me-1"></i><span th:text="${successMsg}"></span>
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+  </div>
+  <div th:if="${errorMsg}" class="alert alert-danger alert-dismissible py-2">
+    <i class="bi bi-exclamation-triangle-fill me-1"></i><span th:text="${errorMsg}"></span>
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+  </div>
+
+  <!-- Add Book Form -->
+  <div class="card clms-card mb-4">
+    <div class="card-header fw-bold"><i class="bi bi-plus-circle me-1"></i>Add New Book</div>
+    <div class="card-body">
+      <form th:action="@{/admin/books/add}" method="post" class="row g-3">
+        <div class="col-md-4">
+          <input type="text" name="title" class="form-control" placeholder="Book Title *" required/>
+        </div>
+        <div class="col-md-3">
+          <input type="text" name="author" class="form-control" placeholder="Author *" required/>
+        </div>
+        <div class="col-md-2">
+          <input type="text" name="isbn" class="form-control" placeholder="ISBN"/>
+        </div>
+        <div class="col-md-3">
+          <select name="categoryId" class="form-select" required>
+            <option value="">Select Category *</option>
+            <option th:each="cat : ${categories}" th:value="${cat.id}" th:text="${cat.name}"></option>
+          </select>
+        </div>
+        <div class="col-md-2">
+          <input type="number" name="copies" class="form-control" placeholder="Copies" value="1" min="1"/>
+        </div>
+        <div class="col-md-2">
+          <input type="text" name="shelfLocation" class="form-control" placeholder="Shelf e.g. CSE-A01"/>
+        </div>
+        <div class="col-md-2">
+          <input type="number" name="price" step="0.01" class="form-control" placeholder="Price (₹)"/>
+        </div>
+        <div class="col-md-4">
+          <input type="text" name="description" class="form-control" placeholder="Short Description"/>
+        </div>
+        <div class="col-md-2">
+          <button type="submit" class="btn btn-success w-100"><i class="bi bi-plus me-1"></i>Add Book</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Books Table -->
+  <div class="table-responsive">
+    <table class="table table-hover align-middle clms-table" id="booksTable">
+      <thead><tr>
+        <th>ID</th><th>Title</th><th>Author</th><th>ISBN</th>
+        <th>Category</th><th>Total</th><th>Available</th><th>Price</th><th>Shelf</th><th>Status</th>
+      </tr></thead>
+      <tbody>
+        <tr th:each="book : ${books}">
+          <td th:text="${book.id}"></td>
+          <td class="fw-semibold" th:text="${book.title}"></td>
+          <td th:text="${book.author}"></td>
+          <td th:text="${book.isbn}"></td>
+          <td th:text="${book.category != null} ? ${book.category.code} : '—'"></td>
+          <td class="text-center" th:text="${book.totalCopies}"></td>
+          <td class="text-center"><span class="badge" th:text="${book.availableCopies}"
+            th:classappend="${book.availableCopies > 0} ? 'bg-success' : 'bg-danger'"></span></td>
+          <td th:text="${book.price != null} ? '₹'+${book.price} : '—'"></td>
+          <td th:text="${book.shelfLocation}"></td>
+          <td><span class="badge" th:text="${book.status}"
+            th:classappend="${book.status == 'active'} ? 'bg-success' : 'bg-secondary'"></span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div th:replace="~{fragments/header :: footer}"></div>
+</body>
+</html>

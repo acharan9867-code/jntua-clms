@@ -1,0 +1,85 @@
+﻿<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/header :: head('Book Catalog')}"></head>
+<body class="clms-body">
+<div th:replace="~{fragments/header :: navbar}"></div>
+
+<div class="container-fluid px-4 py-4">
+  <div class="row mb-3 align-items-center">
+    <div class="col-md-7">
+      <h4 class="fw-bold mb-0"><i class="bi bi-collection-fill me-2"></i>Book Catalog</h4>
+      <p class="text-muted small mb-0">Browse and borrow books from JNTUA Central Library</p>
+    </div>
+    <div class="col-md-5">
+      <form th:action="@{/catalog}" method="get" class="d-flex gap-2">
+        <input type="text" name="keyword" class="form-control" placeholder="Search by title, author, ISBN..."
+               th:value="${keyword}"/>
+        <button type="submit" class="btn btn-primary px-3"><i class="bi bi-search"></i></button>
+        <a th:href="@{/catalog}" class="btn btn-outline-secondary"><i class="bi bi-x-lg"></i></a>
+      </form>
+    </div>
+  </div>
+
+  <!-- Alerts -->
+  <div th:if="${successMsg}" class="alert alert-success alert-dismissible py-2" role="alert">
+    <i class="bi bi-check-circle-fill me-1"></i><span th:text="${successMsg}"></span>
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+  </div>
+  <div th:if="${errorMsg}" class="alert alert-danger alert-dismissible py-2" role="alert">
+    <i class="bi bi-exclamation-triangle-fill me-1"></i><span th:text="${errorMsg}"></span>
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+  </div>
+
+  <!-- Category Pills -->
+  <div class="mb-3 d-flex flex-wrap gap-2">
+    <a th:href="@{/catalog}" class="btn btn-sm"
+       th:classappend="${selectedCategory == null} ? 'btn-primary' : 'btn-outline-primary'">All</a>
+    <a th:each="cat : ${categories}" th:href="@{/catalog(categoryId=${cat.id})}"
+       class="btn btn-sm"
+       th:classappend="${selectedCategory == cat.id} ? 'btn-primary' : 'btn-outline-primary'"
+       th:text="${cat.code}"></a>
+  </div>
+
+  <!-- Book Grid -->
+  <div th:if="${#lists.isEmpty(books)}" class="text-center py-5">
+    <i class="bi bi-search display-4 text-muted"></i>
+    <p class="text-muted mt-2">No books found. Try a different search term.</p>
+  </div>
+  <div class="row g-3">
+    <div th:each="book : ${books}" class="col-sm-6 col-md-4 col-lg-3 col-xl-2">
+      <div class="card book-card h-100">
+        <div class="book-card-header d-flex align-items-center justify-content-center">
+          <i class="bi bi-book-fill display-6 text-primary-emphasis"></i>
+        </div>
+        <div class="card-body p-2">
+          <div class="badge mb-1" th:classappend="${book.availableCopies > 0} ? 'bg-success' : 'bg-danger'"
+               th:text="${book.availableCopies > 0} ? 'Available ('+book.availableCopies+')' : 'Unavailable'"></div>
+          <h6 class="card-title mb-1 fw-bold" th:text="${book.title}" style="font-size:0.8rem;line-height:1.2"></h6>
+          <p class="card-text text-muted mb-0" style="font-size:0.75rem" th:text="${book.author}"></p>
+          <p class="card-text small mb-0 text-secondary" th:if="${book.category != null}"
+             th:text="${book.category.code}"></p>
+          <p class="card-text small fw-bold mt-1 text-success" th:if="${book.price != null}"
+             th:text="'₹' + ${book.price}"></p>
+        </div>
+        <div class="card-footer p-2 d-grid gap-1">
+          <form th:if="${book.availableCopies > 0}" th:action="@{/catalog/borrow/{id}(id=${book.id})}" method="post">
+            <button type="submit" class="btn btn-primary btn-sm w-100 confirm-action"
+                    data-msg="Request borrow for this book?">
+              <i class="bi bi-book me-1"></i>Borrow
+            </button>
+          </form>
+          <form th:if="${book.availableCopies == 0}" th:action="@{/catalog/reserve/{id}(id=${book.id})}" method="post">
+            <button type="submit" class="btn btn-warning btn-sm w-100 confirm-action"
+                    data-msg="Add to reservation queue?">
+              <i class="bi bi-bookmark-plus me-1"></i>Reserve
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div th:replace="~{fragments/header :: footer}"></div>
+</body>
+</html>

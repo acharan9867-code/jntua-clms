@@ -1,0 +1,187 @@
+﻿<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: head('Admin Panel')}"></head>
+<body class="clms-body">
+<div th:replace="~{fragments/header :: navbar}"></div>
+
+<div class="container-fluid px-4 py-4">
+  <h4 class="fw-bold mb-1"><i class="bi bi-shield-check-fill me-2"></i>Librarian Admin Panel</h4>
+  <p class="text-muted small mb-3">JNTUA Central Library — Manage Issues, Returns &amp; Inventory</p>
+
+  <!-- Alerts -->
+  <div th:if="${successMsg}" class="alert alert-success alert-dismissible py-2">
+    <i class="bi bi-check-circle-fill me-1"></i><span th:text="${successMsg}"></span>
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+  </div>
+  <div th:if="${errorMsg}" class="alert alert-danger alert-dismissible py-2">
+    <i class="bi bi-exclamation-triangle-fill me-1"></i><span th:text="${errorMsg}"></span>
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+  </div>
+
+  <!-- Stats -->
+  <div class="row g-3 mb-4">
+    <div class="col-sm-3"><div class="stat-card text-center p-3">
+      <div class="display-6 fw-bold text-primary" th:text="${totalBooks}"></div>
+      <div class="small text-muted">Total Books</div>
+    </div></div>
+    <div class="col-sm-3"><div class="stat-card text-center p-3">
+      <div class="display-6 fw-bold text-success" th:text="${totalUsers}"></div>
+      <div class="small text-muted">Registered Users</div>
+    </div></div>
+    <div class="col-sm-3"><div class="stat-card text-center p-3">
+      <div class="display-6 fw-bold text-info" th:text="${totalActive}"></div>
+      <div class="small text-muted">Active Loans</div>
+    </div></div>
+    <div class="col-sm-3"><div class="stat-card text-center p-3">
+      <div class="display-6 fw-bold text-danger" th:text="${#lists.size(overdueLoans)}"></div>
+      <div class="small text-muted">Overdue Books</div>
+    </div></div>
+  </div>
+
+  <!-- Nav Tabs -->
+  <ul class="nav nav-tabs mb-3" id="adminTabs">
+    <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tabPending">
+      <i class="bi bi-hourglass me-1"></i>Pending Issues
+      <span class="badge bg-warning text-dark ms-1" th:text="${#lists.size(pendingIssues)}"></span>
+    </button></li>
+    <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tabReturn">
+      <i class="bi bi-arrow-return-left me-1"></i>Return Requests
+      <span class="badge bg-info ms-1" th:text="${#lists.size(returnRequests)}"></span>
+    </button></li>
+    <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tabOverdue">
+      <i class="bi bi-exclamation-triangle-fill me-1 text-danger"></i>Overdue
+      <span class="badge bg-danger ms-1" th:text="${#lists.size(overdueLoans)}"></span>
+    </button></li>
+    <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tabBookReq">
+      <i class="bi bi-plus-square me-1"></i>Book Requests
+      <span class="badge bg-secondary ms-1" th:text="${#lists.size(bookRequests)}"></span>
+    </button></li>
+    <li class="nav-item"><a class="nav-link" th:href="@{/admin/books}">
+      <i class="bi bi-archive me-1"></i>Inventory
+    </a></li>
+    <li class="nav-item"><a class="nav-link" th:href="@{/admin/reports}">
+      <i class="bi bi-bar-chart-line me-1"></i>Reports
+    </a></li>
+  </ul>
+
+  <div class="tab-content">
+    <!-- Pending Issues -->
+    <div class="tab-pane fade show active" id="tabPending">
+      <div th:if="${#lists.isEmpty(pendingIssues)}" class="alert alert-info py-2 small">No pending issue requests.</div>
+      <div class="table-responsive" th:if="${!#lists.isEmpty(pendingIssues)}">
+        <table class="table table-hover align-middle clms-table">
+          <thead><tr><th>Txn ID</th><th>Student</th><th>Book</th><th>Requested</th><th>Action</th></tr></thead>
+          <tbody>
+            <tr th:each="txn : ${pendingIssues}">
+              <td th:text="'#'+${txn.id}"></td>
+              <td><span th:text="${txn.user.name}"></span><br/>
+                <span class="text-muted small" th:text="${txn.user.memberId}"></span></td>
+              <td><span class="fw-semibold" th:text="${txn.book.title}"></span><br/>
+                <span class="text-muted small" th:text="${txn.book.author}"></span></td>
+              <td th:text="${txn.requestDate}"></td>
+              <td>
+                <form th:action="@{/admin/confirm-issue/{id}(id=${txn.id})}" method="post" class="d-inline">
+                  <button class="btn btn-success btn-sm confirm-action" data-msg="Confirm book issue?">
+                    <i class="bi bi-check-circle me-1"></i>Confirm Issue
+                  </button>
+                </form>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Return Requests -->
+    <div class="tab-pane fade" id="tabReturn">
+      <div th:if="${#lists.isEmpty(returnRequests)}" class="alert alert-info py-2 small">No return requests.</div>
+      <div class="table-responsive" th:if="${!#lists.isEmpty(returnRequests)}">
+        <table class="table table-hover align-middle clms-table">
+          <thead><tr><th>Txn ID</th><th>Student</th><th>Book</th><th>Due Date</th><th>Action</th></tr></thead>
+          <tbody>
+            <tr th:each="txn : ${returnRequests}">
+              <td th:text="'#'+${txn.id}"></td>
+              <td th:text="${txn.user.name}"></td>
+              <td th:text="${txn.book.title}"></td>
+              <td th:text="${txn.dueDate}"
+                  th:classappend="${txn.dueDate != null and txn.dueDate.isBefore(T(java.time.LocalDate).now())} ? 'text-danger fw-bold' : ''"></td>
+              <td class="d-flex gap-1 flex-wrap">
+                <form th:action="@{/admin/confirm-return/{id}(id=${txn.id})}" method="post">
+                  <button class="btn btn-primary btn-sm confirm-action" data-msg="Confirm return?">
+                    <i class="bi bi-check-circle me-1"></i>Accept Return
+                  </button>
+                </form>
+                <form th:action="@{/admin/mark-condition/{id}(id=${txn.id})}" method="post" class="d-inline">
+                  <input type="hidden" name="condition" value="lost"/>
+                  <button class="btn btn-danger btn-sm confirm-action" data-msg="Mark as LOST? Fine will be applied.">
+                    <i class="bi bi-exclamation-circle me-1"></i>Mark Lost
+                  </button>
+                </form>
+                <form th:action="@{/admin/mark-condition/{id}(id=${txn.id})}" method="post" class="d-inline">
+                  <input type="hidden" name="condition" value="damaged"/>
+                  <button class="btn btn-warning btn-sm confirm-action" data-msg="Mark as DAMAGED? Penalty applied.">
+                    <i class="bi bi-tools me-1"></i>Mark Damaged
+                  </button>
+                </form>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Overdue -->
+    <div class="tab-pane fade" id="tabOverdue">
+      <div th:if="${#lists.isEmpty(overdueLoans)}" class="alert alert-success py-2 small">No overdue books!</div>
+      <div class="table-responsive" th:if="${!#lists.isEmpty(overdueLoans)}">
+        <table class="table table-hover align-middle clms-table">
+          <thead><tr><th>Txn ID</th><th>Student</th><th>Book</th><th>Due Date</th><th>Days Overdue</th></tr></thead>
+          <tbody>
+            <tr th:each="txn : ${overdueLoans}" class="table-danger">
+              <td th:text="'#'+${txn.id}"></td>
+              <td th:text="${txn.user.name}"></td>
+              <td th:text="${txn.book.title}"></td>
+              <td class="fw-bold" th:text="${txn.dueDate}"></td>
+              <td class="fw-bold text-danger"
+                  th:text="${T(java.time.temporal.ChronoUnit).DAYS.between(txn.dueDate, T(java.time.LocalDate).now())} + ' days'"></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Book Requests -->
+    <div class="tab-pane fade" id="tabBookReq">
+      <div th:if="${#lists.isEmpty(bookRequests)}" class="alert alert-info py-2 small">No pending book requests.</div>
+      <div class="table-responsive" th:if="${!#lists.isEmpty(bookRequests)}">
+        <table class="table table-hover align-middle clms-table">
+          <thead><tr><th>From</th><th>Book Title</th><th>Author</th><th>Reason</th><th>Actions</th></tr></thead>
+          <tbody>
+            <tr th:each="req : ${bookRequests}">
+              <td th:text="${req.user.name}"></td>
+              <td class="fw-semibold" th:text="${req.bookTitle}"></td>
+              <td th:text="${req.author}"></td>
+              <td th:text="${req.reason}"></td>
+              <td class="d-flex gap-1">
+                <form th:action="@{/admin/book-request/{id}/approve(id=${req.id})}" method="post">
+                  <button class="btn btn-success btn-sm confirm-action" data-msg="Approve this book request?">
+                    <i class="bi bi-check me-1"></i>Approve
+                  </button>
+                </form>
+                <form th:action="@{/admin/book-request/{id}/reject(id=${req.id})}" method="post">
+                  <button class="btn btn-danger btn-sm confirm-action" data-msg="Reject this request?">
+                    <i class="bi bi-x me-1"></i>Reject
+                  </button>
+                </form>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div th:replace="~{fragments/header :: footer}"></div>
+</body>
+</html>

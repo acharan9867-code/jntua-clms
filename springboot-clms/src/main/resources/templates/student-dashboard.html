@@ -1,0 +1,161 @@
+﻿<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/header :: head('My Dashboard')}"></head>
+<body class="clms-body">
+<div th:replace="~{fragments/header :: navbar}"></div>
+
+<div class="container-fluid px-4 py-4">
+  <div class="row mb-3">
+    <div class="col">
+      <h4 class="fw-bold"><i class="bi bi-person-circle me-2"></i>My Library Dashboard</h4>
+      <p class="text-muted small">Welcome, <strong th:text="${user.name}"></strong> | Member ID: <span th:text="${user.memberId}"></span></p>
+    </div>
+    <div class="col-auto">
+      <a th:href="@{/catalog}" class="btn btn-primary btn-sm"><i class="bi bi-book me-1"></i>Browse Catalog</a>
+    </div>
+  </div>
+
+  <!-- Alerts -->
+  <div th:if="${successMsg}" class="alert alert-success alert-dismissible py-2">
+    <i class="bi bi-check-circle-fill me-1"></i><span th:text="${successMsg}"></span>
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+  </div>
+  <div th:if="${errorMsg}" class="alert alert-danger alert-dismissible py-2">
+    <i class="bi bi-exclamation-triangle-fill me-1"></i><span th:text="${errorMsg}"></span>
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+  </div>
+
+  <!-- Stats Row -->
+  <div class="row g-3 mb-4">
+    <div class="col-sm-4">
+      <div class="stat-card text-center p-3">
+        <div class="display-6 text-primary fw-bold" th:text="${#lists.size(activeTransactions)}"></div>
+        <div class="small text-muted">Books Borrowed</div>
+      </div>
+    </div>
+    <div class="col-sm-4">
+      <div class="stat-card text-center p-3">
+        <div class="display-6 text-warning fw-bold" th:text="${#lists.size(reservations)}"></div>
+        <div class="small text-muted">Reservations</div>
+      </div>
+    </div>
+    <div class="col-sm-4">
+      <div class="stat-card text-center p-3">
+        <div class="display-6 text-success fw-bold" th:text="${user.maxBooksAllowed}"></div>
+        <div class="small text-muted">Borrowing Limit</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Active Loans -->
+  <h5 class="fw-bold mb-3"><i class="bi bi-book-fill me-2 text-primary"></i>Active Loans</h5>
+  <div th:if="${#lists.isEmpty(activeTransactions)}" class="alert alert-info py-2 small">No active borrowings.</div>
+  <div class="table-responsive mb-4" th:if="${!#lists.isEmpty(activeTransactions)}">
+    <table class="table table-hover align-middle clms-table">
+      <thead><tr>
+        <th>Book Title</th><th>Author</th><th>Issue Date</th>
+        <th>Due Date</th><th>Status</th><th>Action</th>
+      </tr></thead>
+      <tbody>
+        <tr th:each="txn : ${activeTransactions}">
+          <td class="fw-semibold" th:text="${txn.book.title}"></td>
+          <td th:text="${txn.book.author}"></td>
+          <td th:text="${txn.issueDate != null} ? ${txn.issueDate} : 'Pending'"></td>
+          <td><span th:if="${txn.dueDate != null}" th:text="${txn.dueDate}"
+                    th:classappend="${txn.dueDate != null and txn.dueDate.isBefore(T(java.time.LocalDate).now())} ? 'text-danger fw-bold' : ''"></span>
+              <span th:if="${txn.dueDate == null}" class="text-muted">—</span></td>
+          <td><span class="badge" th:text="${txn.status}"
+                    th:classappend="${txn.status.name() == 'ACTIVE'} ? 'bg-success' :
+                                    (${txn.status.name() == 'PENDING_ISSUE'} ? 'bg-warning text-dark' : 'bg-info')"></span></td>
+          <td>
+            <form th:if="${txn.status.name() == 'ACTIVE'}"
+                  th:action="@{/student/return/{id}(id=${txn.id})}" method="post" class="d-inline">
+              <button type="submit" class="btn btn-outline-warning btn-sm confirm-action"
+                      data-msg="Request return for this book?">
+                <i class="bi bi-arrow-return-left me-1"></i>Return
+              </button>
+            </form>
+            <span th:if="${txn.status.name() == 'RETURN_REQUESTED'}" class="text-info small">
+              <i class="bi bi-hourglass-split me-1"></i>Awaiting librarian
+            </span>
+            <span th:if="${txn.status.name() == 'PENDING_ISSUE'}" class="text-warning small">
+              <i class="bi bi-hourglass me-1"></i>Awaiting issue
+            </span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Reservations -->
+  <h5 class="fw-bold mb-3"><i class="bi bi-bookmark-fill me-2 text-warning"></i>My Reservations</h5>
+  <div th:if="${#lists.isEmpty(reservations)}" class="alert alert-info py-2 small">No active reservations.</div>
+  <div class="table-responsive mb-4" th:if="${!#lists.isEmpty(reservations)}">
+    <table class="table table-hover align-middle clms-table">
+      <thead><tr><th>Book</th><th>Reserved On</th><th>Queue Position</th><th>Status</th><th>Action</th></tr></thead>
+      <tbody>
+        <tr th:each="res : ${reservations}">
+          <td th:text="${res.book.title}"></td>
+          <td th:text="${res.reservationDate}"></td>
+          <td class="text-center fw-bold" th:text="${res.queuePosition}"></td>
+          <td><span class="badge" th:text="${res.status}"
+                    th:classappend="${res.status.name() == 'READY_FOR_PICKUP'} ? 'bg-success' : 'bg-secondary'"></span></td>
+          <td>
+            <form th:action="@{/student/cancel-reservation/{id}(id=${res.id})}" method="post">
+              <button type="submit" class="btn btn-outline-danger btn-sm confirm-action"
+                      data-msg="Cancel this reservation?">
+                <i class="bi bi-x-circle me-1"></i>Cancel
+              </button>
+            </form>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Request a New Book -->
+  <h5 class="fw-bold mb-3"><i class="bi bi-plus-circle-fill me-2 text-success"></i>Request a Book</h5>
+  <div class="card clms-card mb-4">
+    <div class="card-body">
+      <form th:action="@{/student/book-request}" method="post" class="row g-3">
+        <div class="col-md-4">
+          <input type="text" name="bookTitle" class="form-control" placeholder="Book Title *" required/>
+        </div>
+        <div class="col-md-3">
+          <input type="text" name="author" class="form-control" placeholder="Author (optional)"/>
+        </div>
+        <div class="col-md-2">
+          <input type="text" name="isbn" class="form-control" placeholder="ISBN (optional)"/>
+        </div>
+        <div class="col-md-2">
+          <input type="text" name="reason" class="form-control" placeholder="Reason (optional)"/>
+        </div>
+        <div class="col-md-1">
+          <button type="submit" class="btn btn-success w-100"><i class="bi bi-send"></i></button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Borrowing History -->
+  <h5 class="fw-bold mb-3"><i class="bi bi-clock-history me-2 text-secondary"></i>Borrowing History</h5>
+  <div th:if="${#lists.isEmpty(history)}" class="alert alert-info py-2 small">No borrowing history yet.</div>
+  <div class="table-responsive" th:if="${!#lists.isEmpty(history)}">
+    <table class="table table-hover align-middle clms-table">
+      <thead><tr><th>Book</th><th>Issue Date</th><th>Return Date</th><th>Fine Charged</th></tr></thead>
+      <tbody>
+        <tr th:each="txn : ${history}">
+          <td th:text="${txn.book.title}"></td>
+          <td th:text="${txn.issueDate}"></td>
+          <td th:text="${txn.returnDate}"></td>
+          <td th:text="${txn.calculatedFine != null and txn.calculatedFine.compareTo(T(java.math.BigDecimal).ZERO) > 0}
+                       ? '₹' + txn.calculatedFine : '—'"></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div th:replace="~{fragments/header :: footer}"></div>
+</body>
+</html>

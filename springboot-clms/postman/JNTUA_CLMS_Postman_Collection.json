@@ -1,0 +1,151 @@
+﻿{
+  "info": {
+    "name": "JNTUA CLMS API",
+    "description": "JNTUA Central Library Management System — Spring Boot REST API\nDeveloped by Charan Apilagunta",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": { "type": "basic" },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8080" },
+    { "key": "adminEmail", "value": "acharan9867@gmail.com" },
+    { "key": "adminPassword", "value": "charan@143232" },
+    { "key": "studentEmail", "value": "student.charan@gmail.com" },
+    { "key": "studentPassword", "value": "jntua@123" }
+  ],
+  "item": [
+    {
+      "name": "Books",
+      "item": [
+        {
+          "name": "Get All Books",
+          "request": {
+            "method": "GET", "url": "{{baseUrl}}/api/books",
+            "auth": { "type": "basic", "basic": [
+              {"key":"username","value":"{{studentEmail}}"},
+              {"key":"password","value":"{{studentPassword}}"}
+            ]}
+          }
+        },
+        {
+          "name": "Search Books",
+          "request": {
+            "method": "GET", "url": "{{baseUrl}}/api/books?keyword=java",
+            "auth": { "type": "basic", "basic": [
+              {"key":"username","value":"{{studentEmail}}"},
+              {"key":"password","value":"{{studentPassword}}"}
+            ]}
+          }
+        },
+        {
+          "name": "Get Book by ID",
+          "request": {
+            "method": "GET", "url": "{{baseUrl}}/api/books/1",
+            "auth": { "type": "basic", "basic": [
+              {"key":"username","value":"{{studentEmail}}"},
+              {"key":"password","value":"{{studentPassword}}"}
+            ]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "Transactions",
+      "item": [
+        {
+          "name": "Request Borrow",
+          "request": {
+            "method": "POST", "url": "{{baseUrl}}/api/transactions/request-borrow",
+            "header": [{"key":"Content-Type","value":"application/json"}],
+            "body": { "mode": "raw", "raw": "{\"bookId\": 1}" },
+            "auth": { "type": "basic", "basic": [
+              {"key":"username","value":"{{studentEmail}}"},
+              {"key":"password","value":"{{studentPassword}}"}
+            ]}
+          }
+        },
+        {
+          "name": "Confirm Issue (Admin)",
+          "request": {
+            "method": "POST", "url": "{{baseUrl}}/api/transactions/confirm-issue/1",
+            "auth": { "type": "basic", "basic": [
+              {"key":"username","value":"{{adminEmail}}"},
+              {"key":"password","value":"{{adminPassword}}"}
+            ]}
+          }
+        },
+        {
+          "name": "Request Return (Student)",
+          "request": {
+            "method": "POST", "url": "{{baseUrl}}/api/transactions/request-return/1",
+            "auth": { "type": "basic", "basic": [
+              {"key":"username","value":"{{studentEmail}}"},
+              {"key":"password","value":"{{studentPassword}}"}
+            ]}
+          }
+        },
+        {
+          "name": "Confirm Return (Admin)",
+          "request": {
+            "method": "POST", "url": "{{baseUrl}}/api/transactions/confirm-return/1",
+            "auth": { "type": "basic", "basic": [
+              {"key":"username","value":"{{adminEmail}}"},
+              {"key":"password","value":"{{adminPassword}}"}
+            ]}
+          }
+        },
+        {
+          "name": "My Transactions",
+          "request": {
+            "method": "GET", "url": "{{baseUrl}}/api/transactions/my",
+            "auth": { "type": "basic", "basic": [
+              {"key":"username","value":"{{studentEmail}}"},
+              {"key":"password","value":"{{studentPassword}}"}
+            ]}
+          }
+        },
+        {
+          "name": "All Overdue Books (Admin)",
+          "request": {
+            "method": "GET", "url": "{{baseUrl}}/api/transactions/overdue",
+            "auth": { "type": "basic", "basic": [
+              {"key":"username","value":"{{adminEmail}}"},
+              {"key":"password","value":"{{adminPassword}}"}
+            ]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "Reservations",
+      "item": [
+        {
+          "name": "Reserve a Book",
+          "request": {
+            "method": "POST", "url": "{{baseUrl}}/api/reservations/reserve",
+            "header": [{"key":"Content-Type","value":"application/json"}],
+            "body": { "mode": "raw", "raw": "{\"bookId\": 1}" },
+            "auth": { "type": "basic", "basic": [
+              {"key":"username","value":"{{studentEmail}}"},
+              {"key":"password","value":"{{studentPassword}}"}
+            ]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "Get My Profile",
+          "request": {
+            "method": "GET", "url": "{{baseUrl}}/api/users/me",
+            "auth": { "type": "basic", "basic": [
+              {"key":"username","value":"{{studentEmail}}"},
+              {"key":"password","value":"{{studentPassword}}"}
+            ]}
+          }
+        }
+      ]
+    }
+  ]
+}

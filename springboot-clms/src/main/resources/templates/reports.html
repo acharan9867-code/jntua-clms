@@ -1,0 +1,67 @@
+﻿<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: head('Reports')}"></head>
+<body class="clms-body">
+<div th:replace="~{fragments/header :: navbar}"></div>
+
+<div class="container-fluid px-4 py-4">
+  <div class="d-flex align-items-center gap-3 mb-3">
+    <a th:href="@{/admin/dashboard}" class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-left me-1"></i>Back</a>
+    <h4 class="fw-bold mb-0"><i class="bi bi-bar-chart-line-fill me-2"></i>Library Reports</h4>
+  </div>
+
+  <!-- Overdue Report -->
+  <div class="card clms-card mb-4">
+    <div class="card-header fw-bold text-danger"><i class="bi bi-exclamation-triangle-fill me-1"></i>Overdue Books Report</div>
+    <div class="card-body p-0">
+      <div th:if="${#lists.isEmpty(overdueLoans)}" class="p-3 text-center text-muted">No overdue books.</div>
+      <div class="table-responsive" th:if="${!#lists.isEmpty(overdueLoans)}">
+        <table class="table table-hover clms-table mb-0">
+          <thead><tr><th>Txn ID</th><th>Student</th><th>Dept</th><th>Book</th><th>Due Date</th><th>Days Overdue</th><th>Fine (₹)</th></tr></thead>
+          <tbody>
+            <tr th:each="txn : ${overdueLoans}" class="table-danger">
+              <td th:text="'#'+${txn.id}"></td>
+              <td th:text="${txn.user.name}"></td>
+              <td th:text="${txn.user.department}"></td>
+              <td th:text="${txn.book.title}"></td>
+              <td th:text="${txn.dueDate}"></td>
+              <td class="fw-bold text-danger"
+                  th:text="${T(java.time.temporal.ChronoUnit).DAYS.between(txn.dueDate, T(java.time.LocalDate).now())}"></td>
+              <td class="fw-bold text-danger"
+                  th:text="'₹' + ${T(java.time.temporal.ChronoUnit).DAYS.between(txn.dueDate, T(java.time.LocalDate).now())}"></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- User Summary -->
+  <div class="card clms-card">
+    <div class="card-header fw-bold"><i class="bi bi-people-fill me-1"></i>Registered Members</div>
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover clms-table mb-0">
+          <thead><tr><th>Member ID</th><th>Name</th><th>Email</th><th>Role</th><th>Department</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr th:each="u : ${allUsers}">
+              <td th:text="${u.memberId}"></td>
+              <td th:text="${u.name}"></td>
+              <td th:text="${u.email}"></td>
+              <td><span class="badge" th:text="${u.role}"
+                  th:classappend="${u.role.name() == 'ROLE_ADMIN'} ? 'bg-danger' :
+                                  (${u.role.name() == 'ROLE_FACULTY'} ? 'bg-primary' : 'bg-success')"></span></td>
+              <td th:text="${u.department}"></td>
+              <td><span class="badge" th:text="${u.status}"
+                  th:classappend="${u.status == 'active'} ? 'bg-success' : 'bg-secondary'"></span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div th:replace="~{fragments/header :: footer}"></div>
+</body>
+</html>
