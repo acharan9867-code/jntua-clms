@@ -1,9 +1,9 @@
 ﻿import React from "react";
 import { useAuth } from "../context/AuthContext";
-import { UserCheck, Shield, GraduationCap, Sparkles, Phone, Mail, Globe } from "lucide-react";
+import { Phone, Mail, Globe, Clock, ShieldCheck, User } from "lucide-react";
 
 export const JntuaHeader: React.FC = () => {
-  const { user, switchDemoRole } = useAuth();
+  const { user } = useAuth();
 
   return (
     <header className="relative z-30" style={{ background: "rgba(15,23,42,0.95)", borderBottom: "1px solid rgba(56,189,248,0.15)" }}>
@@ -75,32 +75,24 @@ export const JntuaHeader: React.FC = () => {
           </div>
         </div>
 
-        {/* Viva Switcher */}
-        <div className="w-full md:w-auto rounded-xl p-3"
+        {/* Library Info / User Status */}
+        <div className="w-full md:w-auto rounded-xl p-3 flex items-center gap-3"
           style={{ background: "rgba(56,189,248,0.06)", border: "1px solid rgba(56,189,248,0.15)" }}>
-          <div className="flex items-center justify-between gap-3 mb-2">
-            <span className="text-[11px] font-bold text-electric flex items-center gap-1">
-              <Sparkles className="w-3 h-3" />
-              Viva Demo Switcher
-            </span>
-            <span className="text-[10px]" style={{ color: "#64748B" }}>
-              Role: <strong className="text-electric uppercase">{user?.role || "Guest"}</strong>
-            </span>
+          <div className="w-8 h-8 rounded-lg bg-electric/10 border border-electric/20 flex items-center justify-center text-electric">
+            <Clock className="w-4 h-4" />
           </div>
-          <div className="flex items-center gap-1.5">
-            {[
-              { role: "student" as const, icon: GraduationCap, label: "Student", activeColor: "#3B82F6" },
-              { role: "faculty" as const, icon: UserCheck, label: "Faculty", activeColor: "#8B5CF6" },
-              { role: "admin" as const, icon: Shield, label: "Librarian", activeColor: "#F59E0B" },
-            ].map(({ role, icon: Icon, label, activeColor }) => (
-              <button key={role} onClick={() => switchDemoRole(role)}
-                className="btn-ripple px-2.5 py-1.5 text-[11px] font-semibold rounded-lg flex items-center gap-1 transition-all"
-                style={user?.role === role
-                  ? { background: activeColor, color: "#fff", boxShadow: `0 0 12px ${activeColor}60` }
-                  : { background: "rgba(255,255,255,0.05)", color: "#94A3B8", border: "1px solid rgba(255,255,255,0.08)" }}>
-                <Icon className="w-3.5 h-3.5" />{label}
-              </button>
-            ))}
+          <div className="text-left">
+            <div className="text-xs font-bold text-slate-200 flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              Library Portal Active
+            </div>
+            <div className="text-[11px] text-slate-400">
+              {user ? (
+                <span>Logged in as: <strong className="text-electric">{user.name}</strong></span>
+              ) : (
+                <span>Mon–Sat: 8:30 AM – 6:30 PM</span>
+              )}
+            </div>
           </div>
         </div>
       </div>

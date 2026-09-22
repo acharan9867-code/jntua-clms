@@ -1,4 +1,4 @@
-const API_BASE = (import.meta.env.VITE_API_URL as string) || '/api';
+﻿const API_BASE = (import.meta.env.VITE_API_URL as string) || '/api';
 
 export function getAuthToken(): string | null {
   return localStorage.getItem('jntua_clms_token');
@@ -42,7 +42,7 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
 
 export const api = {
   // Auth
-  login: (credentials: { identifier: string; password: string; loginType?: string }) =>
+  login: (credentials: { identifier: string; password?: string; loginType?: string }) =>
     request<{ success: boolean; token: string; user: any; message: string }>('/auth/login', {
       method: 'POST',
       body: JSON.stringify(credentials)
@@ -89,10 +89,19 @@ export const api = {
     }),
 
   // Transactions
-  issueBook: (bookId: number, targetUserId?: number) =>
-    request<{ success: boolean; message: string; details: any }>('/transactions/issue', {
+  issueBook: (payload: {
+    bookId: number;
+    name?: string;
+    email?: string;
+    admissionNumber?: string;
+    phone?: string;
+    mobileNumber?: string;
+    issueDate?: string;
+    targetUserId?: number;
+  }) =>
+    request<{ success: boolean; message: string; token?: string; user?: any; details: any }>('/transactions/issue', {
       method: 'POST',
-      body: JSON.stringify({ bookId, targetUserId })
+      body: JSON.stringify(payload)
     }),
 
   returnBook: (transactionId: number) =>
@@ -209,4 +218,3 @@ export const api = {
   cancelBookRequest: (id: number) =>
     request<{ success: boolean; message: string }>(`/book-requests/${id}`, { method: 'DELETE' })
 };
-

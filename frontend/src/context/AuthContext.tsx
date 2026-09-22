@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+﻿import React, { createContext, useContext, useState, useEffect } from 'react';
 import { User, UserStats } from '../types';
 import { api, setAuthToken, clearAuthToken, getAuthToken } from '../services/api';
 
@@ -9,7 +9,6 @@ interface AuthContextType {
   login: (identifier: string, password?: string, loginType?: 'student' | 'librarian') => Promise<void>;
   logout: () => void;
   refreshProfile: () => Promise<void>;
-  switchDemoRole: (role: 'student' | 'faculty' | 'admin') => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -71,16 +70,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setStats(null);
   };
 
-  const switchDemoRole = async (role: 'student' | 'faculty' | 'admin') => {
-    if (role === 'admin') {
-      await login('acharan apilagunta', 'charan@143232', 'librarian');
-    } else if (role === 'faculty') {
-      await login('JNTUA-FAC-101', 'jntua@123', 'student');
-    } else {
-      await login('21001A0501', 'jntua@123', 'student');
-    }
-  };
-
   return (
     <AuthContext.Provider
       value={{
@@ -89,8 +78,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         isLoading,
         login,
         logout,
-        refreshProfile,
-        switchDemoRole
+        refreshProfile
       }}
     >
       {children}

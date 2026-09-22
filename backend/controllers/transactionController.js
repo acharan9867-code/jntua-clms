@@ -1,3 +1,5 @@
+﻿import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
 import db from '../config/db.js';
 import {
   calculateDueDate,
@@ -6,14 +8,36 @@ import {
   formatDbDate
 } from '../utils/fineCalculator.js';
 
+const JWT_SECRET = process.env.JWT_SECRET || 'jntua_clms_super_secret_jwt_key_2024_anantapur';
+const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '24h';
+
+function signToken(user) {
+  return jwt.sign(
+    { id: user.id, member_id: user.member_id, role: user.role, name: user.name },
+    JWT_SECRET,
+    { expiresIn: JWT_EXPIRES_IN }
+  );
+}
+
 /**
- * Issue a book to a user (Atomically decrements copies, sets 15-day due date)
+ * Issue a book to a user
+ * Supports:
+ * 1. Form submission with student details: name, email (Gmail), admissionNumber (member_id), phone, issueDate
+ * 2. Authenticated user issuing book for self or admin issuing on behalf of student
+ * 3. Persists/updates all student details in the backend database
  */
 export async function issueBook(req, res) {
   try {
-    const { bookId, targetUserId } = req.body;
-    // An admin can issue on behalf of a student/faculty, or a logged-in user issues for self
-    const borrowerId = (req.user.role === 'admin' && targetUserId) ? targetUserId : req.user.id;
+    const {
+      bookId,
+      targetUserId,
+      name,
+      email,
+      admissionNumber,
+      phone,
+      mobileNumber,
+      issueDate: rawIssueDate
+    } = req.body;
 
     if (!bookId) {
       return res.status(400).json({
@@ -22,31 +46,84 @@ export async function issueBook(req, res) {
       });
     }
 
-    // Execute atomically inside database transaction
-    const transactionResult = await db.transaction(async (tx) => {
-      // 1. Fetch borrower details and check borrowing quota
-      const borrower = await tx.get('SELECT * FROM users WHERE id = ? AND status = ?', [borrowerId, 'active']);
-      if (!borrower) {
-        throw new Error('Borrower user not found or account is not active.');
-      }
+    const studentMobile = (phone || mobileNumber || '').trim();
+    const studentAdmission = (admissionNumber || '').trim();
+    const studentEmail = (email || '').trim().toLowerCase();
+    const studentName = (name || '').trim();
 
+    // Determine borrower user ID and ensure student record is created/updated in backend
+    let borrower = null;
+
+    if (studentEmail || studentAdmission) {
+      // Find by email or admission number
+      let existingUser = await db.get(
+        'SELECT * FROM users WHERE (LOWER(email) = ? OR LOWER(member_id) = ?) AND status = ?',
+        [studentEmail || '', studentAdmission.toLowerCase(), 'active']
+      );
+
+      if (existingUser) {
+        // Update user's latest info in database
+        const updatedName = studentName || existingUser.name;
+        const updatedPhone = studentMobile || existingUser.phone;
+        const updatedMemberId = studentAdmission ? studentAdmission.toUpperCase() : existingUser.member_id;
+        const updatedEmail = studentEmail || existingUser.email;
+
+        await db.run(
+          `UPDATE users SET name = ?, phone = ?, member_id = ?, email = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?`,
+          [updatedName, updatedPhone, updatedMemberId, updatedEmail, existingUser.id]
+        );
+
+        borrower = await db.get('SELECT * FROM users WHERE id = ?', [existingUser.id]);
+      } else {
+        // Register new student user in database
+        const finalMemberId = studentAdmission ? studentAdmission.toUpperCase() : ('21001A' + Math.floor(1000 + Math.random() * 9000));
+        const finalName = studentName || 'Student';
+        const finalEmail = studentEmail || `${finalMemberId.toLowerCase()}@gmail.com`;
+        const passwordHash = await bcrypt.hash('jntua@123', 10);
+
+        const insertUser = await db.run(
+          `INSERT INTO users (member_id, name, email, password_hash, role, department, phone, max_books_allowed, status)
+           VALUES (?, ?, ?, ?, 'student', 'Computer Science & Engineering', ?, 3, 'active')`,
+          [finalMemberId, finalName, finalEmail, passwordHash, studentMobile]
+        );
+
+        borrower = await db.get('SELECT * FROM users WHERE id = ?', [insertUser.lastInsertRowid]);
+        console.log(`Registered new student borrower: ${finalName} (${finalMemberId}, ${finalEmail}, ${studentMobile})`);
+      }
+    } else if (req.user) {
+      const borrowerId = (req.user.role === 'admin' && targetUserId) ? targetUserId : req.user.id;
+      borrower = await db.get('SELECT * FROM users WHERE id = ? AND status = ?', [borrowerId, 'active']);
+    }
+
+    if (!borrower) {
+      return res.status(400).json({
+        success: false,
+        message: 'Student details (Name, Gmail, Admission Number, Mobile Number) are required to borrow.'
+      });
+    }
+
+    const borrowerId = borrower.id;
+
+    // Execute issue transaction atomically
+    const transactionResult = await db.transaction(async (tx) => {
+      // 1. Quota check
       const activeIssues = await tx.get(
         "SELECT COUNT(*) as count FROM transactions WHERE user_id = ? AND status = 'issued'",
         [borrowerId]
       );
       if (activeIssues.count >= borrower.max_books_allowed) {
         throw new Error(
-          `Borrowing limit exceeded. ${borrower.role === 'faculty' ? 'Faculty' : 'Student'} quota is ${borrower.max_books_allowed} books. Please return an existing book first.`
+          `Borrowing limit exceeded. Maximum quota is ${borrower.max_books_allowed} books. Please return an existing book first.`
         );
       }
 
-      // 2. Check if user already holds a copy of this book
+      // 2. Check if user already holds this book
       const existingHold = await tx.get(
         "SELECT id FROM transactions WHERE user_id = ? AND book_id = ? AND status = 'issued'",
         [borrowerId, bookId]
       );
       if (existingHold) {
-        throw new Error('User already has an active issued copy of this book.');
+        throw new Error('You already have an active issued copy of this book.');
       }
 
       // 3. Check book availability
@@ -59,9 +136,13 @@ export async function issueBook(req, res) {
         throw new Error('No physical copies currently available. You may reserve this book to join the waitlist.');
       }
 
-      // 4. Calculate exact 15-day due date
-      const issueDate = new Date();
-      const dueDate = calculateDueDate(issueDate);
+      // 4. Calculate exact issue and 15-day due date
+      const issueDateObj = rawIssueDate ? new Date(rawIssueDate) : new Date();
+      // Set to current time if only date was provided
+      if (isNaN(issueDateObj.getTime())) {
+        throw new Error('Invalid issue date format.');
+      }
+      const dueDateObj = calculateDueDate(issueDateObj);
 
       // 5. Decrement available copies
       await tx.run(
@@ -69,7 +150,8 @@ export async function issueBook(req, res) {
         [bookId]
       );
 
-      // 6. Create transaction record
+      // 6. Create transaction record with student contact details in notes
+      const notes = `Issued to: ${borrower.name} | Roll No: ${borrower.member_id} | Gmail: ${borrower.email} | Mobile: ${borrower.phone || 'N/A'}`;
       const insertResult = await tx.run(
         `INSERT INTO transactions 
           (user_id, book_id, issue_date, due_date, status, calculated_fine, lost_damaged_charge, total_paid, notes)
@@ -77,13 +159,13 @@ export async function issueBook(req, res) {
         [
           borrowerId,
           bookId,
-          formatDbDate(issueDate),
-          formatDbDate(dueDate),
-          `Issued at JNTUA Central Library counter. Valid for 15 days.`
+          formatDbDate(issueDateObj),
+          formatDbDate(dueDateObj),
+          notes
         ]
       );
 
-      // 7. If borrower had an active reservation for this book, mark it fulfilled
+      // 7. Fulfill any active reservations for this student
       await tx.run(
         "UPDATE reservations SET status = 'fulfilled', updated_at = CURRENT_TIMESTAMP WHERE user_id = ? AND book_id = ? AND status IN ('pending', 'ready_for_pickup')",
         [borrowerId, bookId]
@@ -93,17 +175,26 @@ export async function issueBook(req, res) {
         transactionId: insertResult.lastInsertRowid,
         bookTitle: book.title,
         borrowerName: borrower.name,
-        issueDate: formatDbDate(issueDate),
-        dueDate: formatDbDate(dueDate)
+        borrowerMemberId: borrower.member_id,
+        borrowerEmail: borrower.email,
+        borrowerPhone: borrower.phone,
+        issueDate: formatDbDate(issueDateObj),
+        dueDate: formatDbDate(dueDateObj)
       };
     });
 
+    const token = signToken(borrower);
+    const { password_hash, ...safeUser } = borrower;
+
     res.status(201).json({
       success: true,
-      message: `Book "${transactionResult.bookTitle}" issued successfully. Due date is ${transactionResult.dueDate.split(' ')[0]} (15 days period).`,
+      message: `Book "${transactionResult.bookTitle}" borrowed successfully by ${borrower.name} (${borrower.member_id}). Due date: ${transactionResult.dueDate.split(' ')[0]} (15 days period).`,
+      token,
+      user: safeUser,
       details: transactionResult
     });
   } catch (err) {
+    console.error('issueBook error:', err);
     res.status(400).json({
       success: false,
       message: err.message || 'Failed to issue book.'
@@ -177,7 +268,6 @@ export async function returnBook(req, res) {
       );
 
       // 5. Check reservation queue for this book
-      // If there are pending reservations, notify the first in queue!
       let notifiedUser = null;
       const nextReservation = await tx.get(
         `SELECT r.*, u.name as student_name, u.email as student_email 
@@ -230,7 +320,6 @@ export async function returnBook(req, res) {
 
 /**
  * Report a book as Lost or Damaged
- * Rule: ₹300 replacement/damage fee + applicable late fine. Available copy NOT restored.
  */
 export async function reportLostOrDamaged(req, res) {
   try {
@@ -264,10 +353,8 @@ export async function reportLostOrDamaged(req, res) {
       }
 
       const reportDate = new Date();
-      // Calculate ₹300 fixed fee + late fine
       const feeBreakdown = calculateLostDamagedFee(txn.due_date, reportDate);
 
-      // Decrement total copies (physical asset is destroyed/lost) and DO NOT increment available copies
       await tx.run(
         `UPDATE books SET 
           total_copies = MAX(0, total_copies - 1),
@@ -276,7 +363,6 @@ export async function reportLostOrDamaged(req, res) {
         [txn.book_id]
       );
 
-      // Update transaction status to lost or damaged
       const auditNote = notes || `Reported ${statusType} on ${formatDbDate(reportDate)}. Penalty: ₹300 + Late Fine: ₹${feeBreakdown.lateFine} = Total: ₹${feeBreakdown.totalPayable}.`;
 
       await tx.run(
@@ -320,13 +406,12 @@ export async function reportLostOrDamaged(req, res) {
 }
 
 /**
- * Get current user's transactions (active loans with live fine calculation, and past history)
+ * Get current user's transactions
  */
 export async function getUserTransactions(req, res) {
   try {
     const userId = req.user.id;
 
-    // Active issued books
     const active = await db.query(
       `SELECT t.*, b.title, b.author, b.isbn, b.shelf_location, b.cover_image, c.name as category_name
        FROM transactions t
@@ -337,7 +422,6 @@ export async function getUserTransactions(req, res) {
       [userId]
     );
 
-    // Calculate real-time countdown / overdue for active loans
     const activeWithLiveStats = active.map((item) => {
       const liveFine = calculateFine(item.due_date);
       return {
@@ -349,7 +433,6 @@ export async function getUserTransactions(req, res) {
       };
     });
 
-    // History (returned, lost, damaged)
     const history = await db.query(
       `SELECT t.*, b.title, b.author, b.isbn, b.shelf_location, b.cover_image, c.name as category_name,
         u_admin.name as adjusted_by_admin_name

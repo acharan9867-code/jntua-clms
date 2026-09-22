@@ -1,19 +1,20 @@
-import express from 'express';
+﻿import express from 'express';
 import {
   issueBook,
   returnBook,
   reportLostOrDamaged,
   getUserTransactions
 } from '../controllers/transactionController.js';
-import { verifyToken } from '../middleware/authMiddleware.js';
+import { verifyToken, optionalAuth } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
-router.use(verifyToken);
+// Allow issue with optional token (or direct student details in body)
+router.post('/issue', optionalAuth, issueBook);
 
-router.post('/issue', issueBook);
-router.post('/return', returnBook);
-router.post('/lost-damaged', reportLostOrDamaged);
-router.get('/my-transactions', getUserTransactions);
+// Other endpoints require valid token
+router.post('/return', verifyToken, returnBook);
+router.post('/lost-damaged', verifyToken, reportLostOrDamaged);
+router.get('/my-transactions', verifyToken, getUserTransactions);
 
 export default router;

@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { Book, Category } from '../types';
-import { api } from '../services/api';
+import { api, setAuthToken } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { BookCard } from '../components/BookCard';
 import { BookModal } from '../components/BookModal';
 import { AddBookModal } from '../components/AddBookModal';
+import { BorrowModal } from '../components/BorrowModal';
 import { Search, Filter, Plus, BookOpen, Layers, RefreshCw, BookPlus } from 'lucide-react';
 import { BookRequestModal } from '../components/BookRequestModal';
 
@@ -24,6 +25,8 @@ export const CatalogPage: React.FC<CatalogPageProps> = ({ onIssueSuccess }) => {
 
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [selectedBook, setSelectedBook] = useState<Book | null>(null);
+  const [borrowingBook, setBorrowingBook] = useState<Book | null>(null);
+  const [isBorrowModalOpen, setIsBorrowModalOpen] = useState<boolean>(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState<boolean>(false);
   const [isRequestModalOpen, setIsRequestModalOpen] = useState<boolean>(false);
   const [feedbackMessage, setFeedbackMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
@@ -70,21 +73,41 @@ export const CatalogPage: React.FC<CatalogPageProps> = ({ onIssueSuccess }) => {
     return () => clearTimeout(timer);
   }, [searchQuery, selectedCategory, availableOnly, sortBy]);
 
-  const handleBorrow = async (book: Book) => {
-    if (!user) {
-      alert('Please log in as a Student or Faculty to borrow books.');
-      return;
-    }
-    try {
-      const res = await api.issueBook(book.id);
-      if (res.success) {
-        setFeedbackMessage({ type: 'success', text: res.message });
-        await fetchBooks();
+  // When user taps "Borrow", open the Student Borrow Form Modal
+  const handleOpenBorrowModal = (book: Book) => {
+    setBorrowingBook(book);
+    setIsBorrowModalOpen(true);
+  };
+
+  // Submit student borrow form with all student details
+  const handleConfirmBorrow = async (formData: {
+    bookId: number;
+    name: string;
+    email: string;
+    admissionNumber: string;
+    phone: string;
+    issueDate: string;
+  }) => {
+    const res = await api.issueBook({
+      bookId: formData.bookId,
+      name: formData.name,
+      email: formData.email,
+      admissionNumber: formData.admissionNumber,
+      phone: formData.phone,
+      issueDate: formData.issueDate
+    });
+
+    if (res.success) {
+      // Sync auth state if token is returned
+      if (res.token) {
+        setAuthToken(res.token);
         await refreshProfile();
-        onIssueSuccess?.();
       }
-    } catch (err: any) {
-      setFeedbackMessage({ type: 'error', text: err.message || 'Borrow failed' });
+      setFeedbackMessage({ type: 'success', text: res.message });
+      await fetchBooks();
+      onIssueSuccess?.();
+    } else {
+      throw new Error(res.message || 'Failed to borrow book.');
     }
   };
 
@@ -143,7 +166,7 @@ export const CatalogPage: React.FC<CatalogPageProps> = ({ onIssueSuccess }) => {
               Central Library Book Repository
             </h2>
             <p className="text-xs text-slate-500 mt-0.5">
-              Forgiving search across Title, Author, and ISBN with real-time shelf tracking
+              Search across Title, Author, and ISBN with real-time shelf tracking
             </p>
           </div>
 
@@ -184,7 +207,7 @@ export const CatalogPage: React.FC<CatalogPageProps> = ({ onIssueSuccess }) => {
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Forgiving search: try 'data', 'cormen', '9780132', 'operating'..."
+              placeholder="Search: try 'data', 'cormen', '9780132', 'operating'..."
               className="w-full pl-10 pr-4 py-2 text-xs border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 bg-slate-50/50"
             />
           </div>
@@ -271,7 +294,7 @@ export const CatalogPage: React.FC<CatalogPageProps> = ({ onIssueSuccess }) => {
               <BookOpen className="w-12 h-12 text-slate-300 mx-auto mb-3" />
               <h3 className="text-base font-bold text-slate-800">No matching books found</h3>
               <p className="text-xs text-slate-500 mt-1 max-w-sm mx-auto">
-                Try adjusting your search keywords or switching category filter. For CSE textbooks, try "Algorithms", "Database", or "Networks".
+                Try adjusting your search keywords or switching category filter.
               </p>
               <button
                 onClick={() => {
@@ -294,7 +317,7 @@ export const CatalogPage: React.FC<CatalogPageProps> = ({ onIssueSuccess }) => {
                 key={book.id}
                 book={book}
                 onSelect={(b) => setSelectedBook(b)}
-                onBorrow={(b) => handleBorrow(b)}
+                onBorrow={(b) => handleOpenBorrowModal(b)}
                 onReserve={(b) => handleReserve(b)}
                 isAdmin={user?.role === 'admin'}
               />
@@ -307,8 +330,22 @@ export const CatalogPage: React.FC<CatalogPageProps> = ({ onIssueSuccess }) => {
       <BookModal
         book={selectedBook}
         onClose={() => setSelectedBook(null)}
-        onBorrow={(b) => handleBorrow(b)}
+        onBorrow={(b) => {
+          setSelectedBook(null);
+          handleOpenBorrowModal(b);
+        }}
         onReserve={(b) => handleReserve(b)}
+      />
+
+      {/* Student Borrow Form Modal (asks name, gmail, admission no, mobile, date) */}
+      <BorrowModal
+        book={borrowingBook}
+        isOpen={isBorrowModalOpen}
+        onClose={() => {
+          setIsBorrowModalOpen(false);
+          setBorrowingBook(null);
+        }}
+        onSubmit={handleConfirmBorrow}
       />
 
       {/* Admin Add Book Modal */}

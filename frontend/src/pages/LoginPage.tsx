@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+﻿import React, { useState, useCallback } from "react";
 import { useAuth } from "../context/AuthContext";
 import {
   GraduationCap,
@@ -6,11 +6,9 @@ import {
   Lock,
   Mail,
   ArrowRight,
-  Sparkles,
   RefreshCw,
   CheckCircle2,
   Code2,
-  UserCheck,
   KeyRound,
   User
 } from "lucide-react";
@@ -34,7 +32,7 @@ function generateCaptcha() {
 }
 
 export const LoginPage: React.FC<LoginPageProps> = ({ onSuccessLogin }) => {
-  const { login, switchDemoRole, isLoading } = useAuth();
+  const { login, isLoading } = useAuth();
   const [loginRole, setLoginRole] = useState<"student" | "librarian">("student");
 
   // Student form fields
@@ -85,7 +83,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccessLogin }) => {
           return;
         }
         if (!studentPassword) {
-          setError("Please enter your Gmail password.");
+          setError("Please enter your password.");
           return;
         }
         await login(trimmedEmail, studentPassword, "student");
@@ -106,15 +104,6 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccessLogin }) => {
     } catch (err: any) {
       setError(err.message || "Login failed. Please verify credentials.");
       refreshCaptcha();
-    }
-  };
-
-  const handleDemo = async (role: "student" | "faculty" | "admin") => {
-    try {
-      await switchDemoRole(role);
-      onSuccessLogin();
-    } catch (err: any) {
-      setError(err.message || "Demo login failed");
     }
   };
 
@@ -182,7 +171,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccessLogin }) => {
               JNTUA Central Library
             </h2>
             <p className="text-[11px] mt-0.5 font-medium" style={{ color: "#38BDF8" }}>
-              Dr. A.P.J. Abdul Kalam Library — Portal Sign In
+              Dr. A.P.J. Abdul Kalam Library — Member Sign In
             </p>
           </div>
 
@@ -266,14 +255,14 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccessLogin }) => {
                       required
                     />
                     <p className="text-[10px] mt-1" style={{ color: "#64748B" }}>
-                      ✓ Enter your personal Gmail to access or auto-create your student account
+                      ✓ Enter your personal Gmail to sign in or auto-create your student account
                     </p>
                   </div>
 
                   <div>
                     <label className="block text-xs font-bold mb-1.5 flex items-center gap-1.5" style={{ color: "#94A3B8" }}>
                       <Lock className="w-3.5 h-3.5" style={{ color: "#38BDF8" }} />
-                      Gmail Password <span className="text-red-400">*</span>
+                      Password <span className="text-red-400">*</span>
                     </label>
                     <input
                       type="password"
@@ -415,61 +404,6 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccessLogin }) => {
                 )}
               </button>
             </form>
-
-            {/* Quick Demo Logins Section */}
-            <div className="pt-3" style={{ borderTop: "1px solid rgba(56,189,248,0.1)" }}>
-              <div className="flex items-center gap-1.5 mb-2.5 text-xs font-bold" style={{ color: "#64748B" }}>
-                <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-                1-Click Quick Viva Demo Logins
-              </div>
-              <div className="grid grid-cols-1 gap-2">
-                {[
-                  {
-                    role: "student" as const,
-                    icon: GraduationCap,
-                    name: "S. Charan Reddy",
-                    id: "21001A0501 • Student Portal",
-                    color: "#3B82F6",
-                    glow: "rgba(59,130,246,0.3)",
-                  },
-                  {
-                    role: "admin" as const,
-                    icon: Shield,
-                    name: "Chief Librarian",
-                    id: "Library Admin Portal",
-                    color: "#F59E0B",
-                    glow: "rgba(245,158,11,0.3)",
-                  },
-                ].map(({ role, icon: Icon, name, id, color, glow }) => (
-                  <button
-                    key={role}
-                    type="button"
-                    onClick={() => handleDemo(role)}
-                    className="btn-ripple p-2.5 rounded-xl text-left transition-all flex items-center justify-between"
-                    style={{ background: `${color}10`, border: `1px solid ${color}30` }}
-                    onMouseEnter={(e) => {
-                      (e.currentTarget as HTMLElement).style.boxShadow = `0 0 16px ${glow}`;
-                      (e.currentTarget as HTMLElement).style.borderColor = `${color}60`;
-                    }}
-                    onMouseLeave={(e) => {
-                      (e.currentTarget as HTMLElement).style.boxShadow = "none";
-                      (e.currentTarget as HTMLElement).style.borderColor = `${color}30`;
-                    }}
-                  >
-                    <div className="flex items-center gap-2">
-                      <div className="p-1.5 rounded-lg" style={{ background: color, boxShadow: `0 0 8px ${glow}` }}>
-                        <Icon className="w-3.5 h-3.5 text-white" />
-                      </div>
-                      <div>
-                        <div className="text-xs font-bold" style={{ color: "#F8FAFC" }}>{name}</div>
-                        <div className="text-[10px] font-mono" style={{ color }}>{id}</div>
-                      </div>
-                    </div>
-                    <span className="text-[11px] font-bold" style={{ color }}>Login →</span>
-                  </button>
-                ))}
-              </div>
-            </div>
           </div>
         </div>
 

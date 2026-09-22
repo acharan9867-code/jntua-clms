@@ -1,4 +1,4 @@
-import jwt from 'jsonwebtoken';
+﻿import jwt from 'jsonwebtoken';
 import db from '../config/db.js';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'jntua_clms_super_secret_jwt_key_2024_anantapur';
@@ -41,6 +41,29 @@ export async function verifyToken(req, res, next) {
       error: err.message
     });
   }
+}
+
+/**
+ * Optional token verification - doesn't fail if token is missing
+ */
+export async function optionalAuth(req, res, next) {
+  try {
+    const authHeader = req.headers.authorization;
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      const token = authHeader.split(' ')[1];
+      const decoded = jwt.verify(token, JWT_SECRET);
+      const user = await db.get(
+        'SELECT id, member_id, name, email, role, department, phone, max_books_allowed, status FROM users WHERE id = ? AND status = ?',
+        [decoded.id, 'active']
+      );
+      if (user) {
+        req.user = user;
+      }
+    }
+  } catch (err) {
+    // Ignore invalid token in optional auth
+  }
+  next();
 }
 
 /**
