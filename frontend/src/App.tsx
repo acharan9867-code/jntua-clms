@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import { JntuaHeader } from "./components/JntuaHeader";
 import { Navbar } from "./components/Navbar";
@@ -9,6 +9,7 @@ import { ReportsPage } from "./pages/ReportsPage";
 import { SettingsPage } from "./pages/SettingsPage";
 import { LoginPage } from "./pages/LoginPage";
 import { LoginModal } from "./components/LoginModal";
+import { ScorpionCursor } from "./components/ScorpionCursor";
 
 function MainApp() {
   const { user, isLoading } = useAuth();
@@ -41,6 +42,9 @@ function MainApp() {
 
   return (
     <div className="min-h-screen flex flex-col text-dark-text" style={{ background: "#0F172A" }}>
+      {/* Animated Scorpion Cursor with particle trail */}
+      <ScorpionCursor />
+
       {/* Ambient glow orbs (fixed background) */}
       <div className="orb w-[600px] h-[600px] bg-electric" style={{ top: "-200px", left: "-200px", animationDelay: "0s" }} />
       <div className="orb w-[500px] h-[500px] bg-blue-700" style={{ bottom: "-150px", right: "-150px", animationDelay: "3s" }} />
