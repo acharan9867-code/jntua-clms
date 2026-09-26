@@ -2,9 +2,13 @@
 import { useAuth } from "../context/AuthContext";
 import { BookOpen, LayoutDashboard, Bookmark, Receipt, FileBarChart, Settings, LogOut, Users, Repeat } from "lucide-react";
 
-interface NavbarProps { currentTab: string; setCurrentTab: (tab: string) => void; }
+interface NavbarProps {
+  currentTab: string;
+  setCurrentTab: (tab: string) => void;
+  onOpenLogin?: () => void;
+}
 
-export const Navbar: React.FC<NavbarProps> = ({ currentTab, setCurrentTab }) => {
+export const Navbar: React.FC<NavbarProps> = ({ currentTab, setCurrentTab, onOpenLogin }) => {
   const { user, logout } = useAuth();
 
   const getNavItems = () => {
@@ -80,8 +84,10 @@ export const Navbar: React.FC<NavbarProps> = ({ currentTab, setCurrentTab }) => 
               </button>
             </div>
           ) : (
-            <button onClick={() => setCurrentTab("login")}
-              className="btn-ripple btn-electric px-4 py-1.5 text-xs">
+            <button
+              onClick={() => (onOpenLogin ? onOpenLogin() : setCurrentTab("login"))}
+              className="btn-ripple btn-electric px-4 py-1.5 text-xs font-bold"
+            >
               Sign In
             </button>
           )}

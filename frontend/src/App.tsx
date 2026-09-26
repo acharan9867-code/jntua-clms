@@ -1,4 +1,4 @@
-﻿import React, { useState } from "react";
+﻿import React, { useState, useEffect } from "react";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import { JntuaHeader } from "./components/JntuaHeader";
 import { Navbar } from "./components/Navbar";
@@ -8,10 +8,19 @@ import { AdminDashboard } from "./pages/AdminDashboard";
 import { ReportsPage } from "./pages/ReportsPage";
 import { SettingsPage } from "./pages/SettingsPage";
 import { LoginPage } from "./pages/LoginPage";
+import { LoginModal } from "./components/LoginModal";
 
 function MainApp() {
   const { user, isLoading } = useAuth();
   const [currentTab, setCurrentTab] = useState<string>("catalog");
+  // Automatically open the sign-in popup directly on website load if not authenticated
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (!isLoading && !user) {
+      setIsLoginModalOpen(true);
+    }
+  }, [isLoading, user]);
 
   if (isLoading) {
     return (
@@ -37,11 +46,24 @@ function MainApp() {
       <div className="orb w-[500px] h-[500px] bg-blue-700" style={{ bottom: "-150px", right: "-150px", animationDelay: "3s" }} />
       <div className="orb w-[300px] h-[300px] bg-indigo-600" style={{ top: "50%", left: "50%", animationDelay: "6s" }} />
 
-
       {/* Header */}
       <JntuaHeader />
       {/* Navbar */}
-      <Navbar currentTab={currentTab} setCurrentTab={setCurrentTab} />
+      <Navbar
+        currentTab={currentTab}
+        setCurrentTab={setCurrentTab}
+        onOpenLogin={() => setIsLoginModalOpen(true)}
+      />
+
+      {/* Direct Sign In Popup Modal */}
+      <LoginModal
+        isOpen={isLoginModalOpen}
+        onClose={() => setIsLoginModalOpen(false)}
+        onSuccessLogin={() => {
+          setIsLoginModalOpen(false);
+          setCurrentTab(user?.role === "admin" ? "admin-dashboard" : "dashboard");
+        }}
+      />
 
       {/* Main Content */}
       <main className="flex-1 animate-slide-up">
@@ -84,15 +106,15 @@ function MainApp() {
               JNTUA College of Engineering, Ananthapuramu - 515002.<br />
               Jawaharlal Nehru Technological University Anantapur.
             </p>
-            <div className="mt-3 text-xs text-electric/60 font-mono">ðŸŒ www.jntualibrarymanagement.com</div>
+            <div className="mt-3 text-xs text-electric/60 font-mono">🌐 www.jntualibrarymanagement.com</div>
           </div>
           <div>
             <h4 className="text-white font-bold text-sm mb-3">Library Rules</h4>
             <ul className="space-y-1.5 text-xs" style={{ color: "#64748B" }}>
-              <li className="flex items-center gap-2"><span className="text-electric">â–¸</span> Borrowing: <strong className="text-slate-300 ml-1">15 days</strong></li>
-              <li className="flex items-center gap-2"><span className="text-electric">â–¸</span> Late fine: <strong className="text-slate-300 ml-1">â‚¹1 per day</strong></li>
-              <li className="flex items-center gap-2"><span className="text-electric">â–¸</span> Lost book: <strong className="text-slate-300 ml-1">â‚¹300 + fine</strong></li>
-              <li className="flex items-center gap-2"><span className="text-electric">â–¸</span> Timings: <strong className="text-slate-300 ml-1">Monâ€“Sat 8:30AMâ€“6:30PM</strong></li>
+              <li className="flex items-center gap-2"><span className="text-electric">▸</span> Borrowing: <strong className="text-slate-300 ml-1">15 days</strong></li>
+              <li className="flex items-center gap-2"><span className="text-electric">▸</span> Late fine: <strong className="text-slate-300 ml-1">₹1 per day</strong></li>
+              <li className="flex items-center gap-2"><span className="text-electric">▸</span> Lost book: <strong className="text-slate-300 ml-1">₹300 + fine</strong></li>
+              <li className="flex items-center gap-2"><span className="text-electric">▸</span> Timings: <strong className="text-slate-300 ml-1">Mon–Sat 8:30AM–6:30PM</strong></li>
             </ul>
           </div>
           <div>
@@ -102,10 +124,10 @@ function MainApp() {
               Stack: React + TypeScript, Node.js + Express, SQLite, JWT Auth.
             </p>
             <div className="mt-3 text-[11px] text-electric/80 font-semibold">
-              âš¡ Developed by Charan Apilagunta â€¢ JNTUA CSE
+              ⚡ Developed by Charan Apilagunta • JNTUA CSE
             </div>
             <div className="mt-1 text-[10px]" style={{ color: "#334155" }}>
-              Â© {new Date().getFullYear()} DOOM Library Management System
+              © {new Date().getFullYear()} DOOM Library Management System
             </div>
           </div>
         </div>
@@ -119,4 +141,3 @@ function MainApp() {
 export default function App() {
   return <AuthProvider><MainApp /></AuthProvider>;
 }
-
